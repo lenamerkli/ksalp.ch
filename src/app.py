@@ -15,6 +15,7 @@ from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Form
 from logging import INFO as LOG_INFO
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import pbkdf2_hmac
+from werkzeug.utils import secure_filename
 
 from resources import *
 
@@ -256,7 +257,7 @@ class User:
     def create_table() -> None:
         """
         Creates the necessary SQL table
-        :return:
+        :return: None
         """
         query_db('CREATE TABLE IF NOT EXISTS users ('
                  'id TEXT PRIMARY KEY, '
@@ -446,7 +447,7 @@ class User:
     @grade.setter
     def grade(self, v: str) -> None:
         if v not in GRADES.keys():
-            raise ValueError(f"{v} is not a valid search engine")
+            raise ValueError(f"{v} is not a valid grade")
         self._grade = v
 
     def is_banned(self, checks: list) -> bool:
@@ -471,6 +472,277 @@ class User:
         :return: boolean if the user has premium
         """
         return (self.payment - datetime.now()).seconds > 0
+
+
+class Document:
+
+    def __init__(self, id_: str = None, title: str = '', subject: str = '', description: str = '', class_: str = '',
+                 grade: str = '', language: str = '', owner: str = '', edited: datetime = None, created: datetime = None,
+                 extension: str = '', mimetype: str = '', size: int = 0) -> None:
+        self._id = ''
+        self._title = ''
+        self._subject = ''
+        self._description = ''
+        self._class = ''
+        self._grade = ''
+        self._language = ''
+        self._owner = ''
+        self._edited = ''
+        self._created = ''
+        self._extension = ''
+        self._mimetype = ''
+        self._size = 0
+        if id_ is None:
+            id_ = rand_base64(8)
+        if created is None:
+            created = datetime.now()
+        if edited is None:
+            edited = datetime.now()
+        self.id_ = id_
+        self.title = title
+        self.subject = subject
+        self.description = description
+        self.class_ = class_
+        self.grade = grade
+        self.language = language
+        self.owner = owner
+        self.edited = edited
+        self.created = created
+        self.extension = extension
+        self.mimetype = mimetype
+        self.size = size
+
+    def __str__(self) -> str:
+        return f"Document #{self._id}"
+    
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'title': self.title,
+            'subject': self.subject,
+            'description': self.description,
+            'class_': self.class_,
+            'grade': self.grade,
+            'language': self.language,
+            'owner': self.owner,
+            'edited': self.edited,
+            'created': self.created,
+            'extension': self.extension,
+            'mimetype': self.mimetype,
+            'size': self.size,
+        }
+
+    @staticmethod
+    def create_table() -> None:
+        """
+        Creates the necessary SQL table
+        :return: None
+        """
+        query_db('CREATE TABLE IF NOT EXISTS documents ('
+                 'id TEXT PRIMARY KEY, '
+                 'title TEXT NOT NULL, '
+                 'subject TEXT NOT NULL, '
+                 'description TEXT NOT NULL, '
+                 'class TEXT NOT NULL, '
+                 'grade TEXT NOT NULL, '
+                 'language TEXT NOT NULL, '
+                 'owner TEXT NOT NULL, '
+                 'edited TEXT NOT NULL, '
+                 'created TEXT NOT NULL, '
+                 'extension TEXT NOT NULL, '
+                 'mimetype TEXT NOT NULL, '
+                 'size INTEGER NOT NULL)')
+
+    def save(self) -> None:
+        """
+        Saves the user in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No user id')
+        if not query_db('SELECT id FROM documents WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO documents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
+                self._id,
+                self._title,
+                self._subject,
+                self._description,
+                self._class,
+                self._grade,
+                self._language,
+                self._owner,
+                self._edited,
+                self._created,
+                self._extension,
+                self._mimetype,
+                self._size,
+            ))
+        else:
+            query_db('UPDATE documents SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, edited=?, '
+                     'created=?, extension=?, mimetype=?, size=? WHERE id=?', (
+                         self._title,
+                         self._subject,
+                         self._description,
+                         self._class,
+                         self._grade,
+                         self._language,
+                         self._owner,
+                         self._edited,
+                         self._created,
+                         self._extension,
+                         self._mimetype,
+                         self._size,
+                         self._id,
+                     ))
+
+    @staticmethod
+    def load(document_id):
+        """
+        loads a document from the database
+        :return: a new document instance
+        """
+        result = query_db('SELECT * FROM documents WHERE id=?', (document_id,), True)
+        if not result:
+            raise KeyError(f"No document with the id #{document_id} has been found")
+        return Document(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, _: str = None) -> None:
+        raise ValueError(f"Cannot change id of user")
+
+    @property
+    def subject(self) -> str:
+        return self._subject
+
+    @subject.setter
+    def subject(self, v: str) -> None:
+        self._subject = v
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @description.setter
+    def description(self, v: str) -> None:
+        self._description = v
+
+    @property
+    def class_(self) -> str:
+        return self._class
+
+    @class_.setter
+    def class_(self, v: str) -> None:
+        self._class = v
+
+    @property
+    def grade(self) -> str:
+        return self._grade
+
+    @grade.setter
+    def grade(self, v: str) -> None:
+        if v not in GRADES.keys():
+            raise ValueError(f"{v} is not a valid grade")
+        self._grade = v
+
+    @property
+    def language(self) -> str:
+        return self._language
+
+    @language.setter
+    def language(self, v: str) -> None:
+        if v not in LANGUAGES.keys():
+            raise ValueError(f"{v} is not a valid language")
+        self._language = v
+
+    @property
+    def owner(self) -> str:
+        return self._owner
+
+    @owner.setter
+    def owner(self, v: str) -> None:
+        if not query_db('SELECT id FROM users WHERE id=?', (v,), True):
+            raise ValueError(f"No user with id #{v} exists")
+        self._owner = v
+
+    @property
+    def edited(self) -> datetime:
+        return datetime.strptime(self._edited, '%Y-%m-%d_%H-%M-%S')
+
+    @edited.setter
+    def edited(self, v: datetime) -> None:
+        self._edited = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    @property
+    def created(self) -> datetime:
+        return datetime.strptime(self._created, '%Y-%m-%d_%H-%M-%S')
+
+    @created.setter
+    def created(self, v: datetime) -> None:
+        self._created = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    @property
+    def extension(self) -> str:
+        return self._extension
+
+    @extension.setter
+    def extension(self, v: str) -> None:
+        self._extension = v.lower()
+
+    @property
+    def mimetype(self) -> str:
+        return self._mimetype
+
+    @mimetype.setter
+    def mimetype(self, v: str) -> None:
+        self._mimetype = v
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    @size.setter
+    def size(self, v: int) -> None:
+        self._size = v
+
+    def format_size(self, use_1024: bool = False) -> str:
+        """
+        Formats the file size in a user readable format
+        :param use_1024: use 1024 steps instead of 1000
+        :return: human-readable file size
+        """
+        units = ' KMGT'  # noqa
+        if use_1024:
+            n = 1024
+        else:
+            n = 1000
+        for i, v in enumerate(units):
+            x = self.size / pow(n, i)
+            if (x < n) or (v == len(units) - 1):
+                if i == 0:
+                    return f"{self.size} Bytes"
+                else:
+                    return f"{self.size:3.1f} {v}{'i' if use_1024 else ''}B"
+
+    def get_owner(self) -> User:
+        """
+        Get the owner as a User class
+        :return: instance of User
+        """
+        return User.load(self.owner)
+
+    def filename(self, lower: bool = False):
+        """
+        Create a save filename from the title and extension
+        :param lower: if it should be all lowercase
+        :return: save filename
+        """
+        x = secure_filename(f"{self._title}.{self.extension}")
+        if lower:
+            x = x.lower()
+        return x
 
 
 if __name__ == '__main__':

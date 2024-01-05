@@ -702,5 +702,186 @@ class Document:
         return x
 
 
+class LearnSet:
+
+    def __init__(self, id_: str = None, title: str = '', subject: str = '', description: str = '', class_: str = '',
+                 grade: str = '', language: str = '', owner: str = '', edited: datetime = None,
+                 created: datetime = None) -> None:
+        self._id = ''
+        self._title = ''
+        self._subject = ''
+        self._description = ''
+        self._class = ''
+        self._grade = ''
+        self._language = ''
+        self._owner = ''
+        self._edited = ''
+        self._created = ''
+        if id_ is None:
+            id_ = rand_base64(8)
+        if created is None:
+            created = datetime.now()
+        if edited is None:
+            edited = datetime.now()
+        self.id_ = id_
+        self.title = title
+        self.subject = subject
+        self.description = description
+        self.class_ = class_
+        self.grade = grade
+        self.language = language
+        self.owner = owner
+        self.edited = edited
+        self.created = created
+
+    def __str__(self) -> str:
+        return f"LearnSet #{self._id}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'title': self.title,
+            'subject': self.subject,
+            'description': self.description,
+            'class_': self.class_,
+            'grade': self.grade,
+            'language': self.language,
+            'owner': self.owner,
+            'edited': self.edited,
+            'created': self.created,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the user in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No user id')
+        if not query_db('SELECT id FROM learn_sets WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO learn_sets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
+                self._id,
+                self._title,
+                self._subject,
+                self._description,
+                self._class,
+                self._grade,
+                self._language,
+                self._owner,
+                self._edited,
+                self._created,
+            ))
+        else:
+            query_db('UPDATE learn_sets SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, edited=?, '
+                     'created=? WHERE id=?', (
+                         self._title,
+                         self._subject,
+                         self._description,
+                         self._class,
+                         self._grade,
+                         self._language,
+                         self._owner,
+                         self._edited,
+                         self._created,
+                         self._id,
+                     ))
+
+    @staticmethod
+    def load(document_id):
+        """
+        loads a document from the database
+        :return: a new document instance
+        """
+        result = query_db('SELECT * FROM documents WHERE id=?', (document_id,), True)
+        if not result:
+            raise KeyError(f"No document with the id #{document_id} has been found")
+        return Document(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, _: str = None) -> None:
+        raise ValueError(f"Cannot change id of user")
+
+    @property
+    def subject(self) -> str:
+        return self._subject
+
+    @subject.setter
+    def subject(self, v: str) -> None:
+        self._subject = v
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @description.setter
+    def description(self, v: str) -> None:
+        self._description = v
+
+    @property
+    def class_(self) -> str:
+        return self._class
+
+    @class_.setter
+    def class_(self, v: str) -> None:
+        self._class = v
+
+    @property
+    def grade(self) -> str:
+        return self._grade
+
+    @grade.setter
+    def grade(self, v: str) -> None:
+        if v not in GRADES.keys():
+            raise ValueError(f"{v} is not a valid grade")
+        self._grade = v
+
+    @property
+    def language(self) -> str:
+        return self._language
+
+    @language.setter
+    def language(self, v: str) -> None:
+        if v not in LANGUAGES.keys():
+            raise ValueError(f"{v} is not a valid language")
+        self._language = v
+
+    @property
+    def owner(self) -> str:
+        return self._owner
+
+    @owner.setter
+    def owner(self, v: str) -> None:
+        if not query_db('SELECT id FROM users WHERE id=?', (v,), True):
+            raise ValueError(f"No user with id #{v} exists")
+        self._owner = v
+
+    @property
+    def edited(self) -> datetime:
+        return datetime.strptime(self._edited, '%Y-%m-%d_%H-%M-%S')
+
+    @edited.setter
+    def edited(self, v: datetime) -> None:
+        self._edited = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    @property
+    def created(self) -> datetime:
+        return datetime.strptime(self._created, '%Y-%m-%d_%H-%M-%S')
+
+    @created.setter
+    def created(self, v: datetime) -> None:
+        self._created = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    def get_owner(self) -> User:
+        """
+        Get the owner as a User class
+        :return: instance of User
+        """
+        return User.load(self.owner)
+
+
 if __name__ == '__main__':
     app.run()

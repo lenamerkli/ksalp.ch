@@ -29,3 +29,15 @@ CREATE TABLE IF NOT EXISTS documents (
     mimetype TEXT NOT NULL,
     size INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS learn_sets (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    description TEXT NOT NULL,
+    class TEXT NOT NULL,
+    grade TEXT NOT NULL,
+    language TEXT NOT NULL,
+    owner TEXT NOT NULL,
+    edited TEXT NOT NULL,
+    created TEXT NOT NULL
+);

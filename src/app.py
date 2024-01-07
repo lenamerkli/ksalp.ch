@@ -512,11 +512,11 @@ class Document:
 
     def save(self) -> None:
         """
-        Saves the user in the database.
+        Saves the document in the database.
         :return: None
         """
         if self._id is None:
-            raise ValueError('No user id')
+            raise ValueError('No document id')
         if not query_db('SELECT id FROM documents WHERE id=?', (self._id,), True):
             query_db('INSERT INTO documents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
                 self._id,
@@ -568,7 +568,7 @@ class Document:
 
     @id_.setter
     def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of user")
+        raise ValueError(f"Cannot change id of document")
 
     @property
     def subject(self) -> str:
@@ -753,11 +753,11 @@ class LearnSet:
 
     def save(self) -> None:
         """
-        Saves the user in the database.
+        Saves the LearnSet in the database.
         :return: None
         """
         if self._id is None:
-            raise ValueError('No user id')
+            raise ValueError('No LearnSet id')
         if not query_db('SELECT id FROM learn_sets WHERE id=?', (self._id,), True):
             query_db('INSERT INTO learn_sets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
                 self._id,
@@ -789,8 +789,8 @@ class LearnSet:
     @staticmethod
     def load(learn_set_id):
         """
-        loads a document from the database
-        :return: a new document instance
+        loads a LearnSet from the database
+        :return: a new LearnSet instance
         """
         result = query_db('SELECT * FROM learn_sets WHERE id=?', (learn_set_id,), True)
         if not result:
@@ -803,7 +803,7 @@ class LearnSet:
 
     @id_.setter
     def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of user")
+        raise ValueError(f"Cannot change id of LearnSet")
 
     @property
     def subject(self) -> str:

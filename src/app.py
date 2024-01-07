@@ -312,8 +312,8 @@ class User:
         return self._id
 
     @id_.setter
-    def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of user")
+    def id_(self, v: str = None) -> None:
+        self._id = v
 
     @property
     def name(self) -> str:
@@ -567,8 +567,8 @@ class Document:
         return self._id
 
     @id_.setter
-    def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of document")
+    def id_(self, v: str = None) -> None:
+        self._id = v
 
     @property
     def subject(self) -> str:
@@ -802,8 +802,8 @@ class LearnSet:
         return self._id
 
     @id_.setter
-    def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of LearnSet")
+    def id_(self, v: str = None) -> None:
+        self._id = v
 
     @property
     def subject(self) -> str:
@@ -955,8 +955,8 @@ class LearnExercise:
         return self._id
 
     @id_.setter
-    def id_(self, _: str = None) -> None:
-        raise ValueError(f"Cannot change id of learn_exercise")
+    def id_(self, v: str = None) -> None:
+        self._id = v
 
     @property
     def set_id(self) -> str:

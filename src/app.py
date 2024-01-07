@@ -787,15 +787,15 @@ class LearnSet:
                      ))
 
     @staticmethod
-    def load(document_id):
+    def load(learn_set_id):
         """
         loads a document from the database
         :return: a new document instance
         """
-        result = query_db('SELECT * FROM documents WHERE id=?', (document_id,), True)
+        result = query_db('SELECT * FROM learn_sets WHERE id=?', (learn_set_id,), True)
         if not result:
-            raise KeyError(f"No document with the id #{document_id} has been found")
-        return Document(*result)
+            raise KeyError(f"No LearnSet with the id #{learn_set_id} has been found")
+        return LearnSet(*result)
 
     @property
     def id_(self) -> str:
@@ -881,6 +881,136 @@ class LearnSet:
         :return: instance of User
         """
         return User.load(self.owner)
+
+
+class LearnExercise:
+
+    def __init__(self, id_: str = None, set_id: str = '', question: str = '', answer: str = '', answers: list = None,
+                 frequency: float = 1.0, auto_check: int = 0):
+        self._id = ''
+        self._set_id = ''
+        self._question = ''
+        self._answer = ''
+        self._answers = ''
+        self._frequency = 1.0
+        self._auto_check = 0
+        if id_ is None:
+            id_ = rand_base64(8)
+        if answers is None:
+            answers = []
+        self.id_ = id_
+        self.set_id = set_id
+        self.question = question
+        self.answer = answer
+        self.answers = answers
+        self.frequency = frequency
+        self.auto_check = auto_check
+
+    def __str__(self) -> str:
+        return f"LearnExercise #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'set_id': self.set_id,
+            'question': self.question,
+            'answer': self.answer,
+            'answers': self.answers,
+            'frequency': self.frequency,
+            'auto_check': self.auto_check,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the LearnExercise in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No LearnExercise id')
+        if not query_db('SELECT id FROM learn_exercises WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO learn_exercises VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
+                self._id,
+                self._set_id,
+                self._question,
+                self._answer,
+                self._answers,
+                self._frequency,
+                self._auto_check,
+            ))
+        else:
+            query_db(
+                'UPDATE learn_exercises SET id=?, set_id=?, question=?, answer=?, answers=?, frequency=?, auto_check=? '
+                'WHERE id=?', (
+                    self._set_id,
+                    self._question,
+                    self._answer,
+                    self._answers,
+                    self._frequency,
+                    self._auto_check,
+                    self._id,
+                ))
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, _: str = None) -> None:
+        raise ValueError(f"Cannot change id of learn_exercise")
+
+    @property
+    def set_id(self) -> str:
+        return self._set_id
+
+    @set_id.setter
+    def set_id(self, v: str) -> None:
+        self._set_id = v
+
+    @property
+    def question(self) -> str:
+        return self._question
+
+    @question.setter
+    def question(self, v: str) -> None:
+        self._question = v
+
+    @property
+    def answer(self) -> str:
+        return self._answer
+
+    @answer.setter
+    def answer(self, v: str) -> None:
+        self._answer = v
+
+    @property
+    def answers(self) -> list:
+        return self._answers.split(', ')
+
+    @answers.setter
+    def answers(self, v: list) -> None:
+        for i in v:
+            if '£' in i:
+                raise ValueError(f"An answer may not contain '£'")
+        self._answers = ', '.join(v)
+
+    @property
+    def frequency(self) -> float:
+        return self._frequency
+
+    @frequency.setter
+    def frequency(self, v: float) -> None:
+        self._frequency = v
+
+    @property
+    def auto_check(self) -> int:
+        return self._auto_check
+
+    @auto_check.setter
+    def auto_check(self, v: int) -> None:
+        self._auto_check = v
+
+    def get_set(self) -> LearnSet:
+        return LearnSet.load(self.set_id)
 
 
 if __name__ == '__main__':

@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS learn_sets (
     edited TEXT NOT NULL,
     created TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS learn_exercises (
+    id TEXT PRIMARY KEY,
+    set_id TEXT NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    answers TEXT NOT NULL,
+    frequency REAL NOT NULL,
+    auto_check INTEGER NOT NULL,
+);

@@ -312,7 +312,7 @@ class User:
         return self._id
 
     @id_.setter
-    def id_(self, v: str = None) -> None:
+    def id_(self, v: str) -> None:
         self._id = v
 
     @property
@@ -567,7 +567,7 @@ class Document:
         return self._id
 
     @id_.setter
-    def id_(self, v: str = None) -> None:
+    def id_(self, v: str) -> None:
         self._id = v
 
     @property
@@ -802,7 +802,7 @@ class LearnSet:
         return self._id
 
     @id_.setter
-    def id_(self, v: str = None) -> None:
+    def id_(self, v: str) -> None:
         self._id = v
 
     @property
@@ -955,7 +955,7 @@ class LearnExercise:
         return self._id
 
     @id_.setter
-    def id_(self, v: str = None) -> None:
+    def id_(self, v: str) -> None:
         self._id = v
 
     @property

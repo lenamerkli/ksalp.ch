@@ -882,6 +882,14 @@ class LearnSet:
         """
         return User.load(self.owner)
 
+    def get_exercises(self) -> list:
+        """
+        Get all LearnExercises corresponding to this set from the database.
+        :return: a list of LearnExercise
+        """
+        result = query_db('SELECT * FROM learn_exercises WHERE set_id=?', (self.id_,), False)
+        return [LearnExercise(*i) for i in result]
+
 
 class LearnExercise:
 
@@ -949,6 +957,17 @@ class LearnExercise:
                     self._auto_check,
                     self._id,
                 ))
+
+    @staticmethod
+    def load(learn_exercise_id):
+        """
+        loads a LearnExercise from the database
+        :return: a new LearnExercise instance
+        """
+        result = query_db('SELECT * FROM learn_exercises WHERE id=?', (learn_exercise_id,), True)
+        if not result:
+            raise KeyError(f"No LearnExercise with the id #{learn_exercise_id} has been found")
+        return LearnExercise(*result)
 
     @property
     def id_(self) -> str:

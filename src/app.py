@@ -1032,5 +1032,123 @@ class LearnExercise:
         return LearnSet.load(self.set_id)
 
 
+class LearnStat:
+
+    def __init__(self, id_: str = None, exercise_id: str = '', owner: str = '', correct: int = 0, wrong: int = 0):
+        self._id = ''
+        self._exercise_id = ''
+        self._owner = ''
+        self._correct = 0
+        self._wrong = 0
+        if id_ is None:
+            id_ = rand_base64(12)
+        self.id_ = id_
+        self.exercise_id = exercise_id
+        self.owner = owner
+        self.correct = correct
+        self.wrong = wrong
+
+    def __str__(self) -> str:
+        return f"LearnStat #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'exercise_id': self.exercise_id,
+            'owner': self.owner,
+            'correct': self.correct,
+            'wrong': self.wrong,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the LearnStat in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No LearnStat id')
+        if not query_db('SELECT id FROM learn_stats WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO learn_stats VALUES (?, ?, ?, ?, ?)', (
+                self._id,
+                self._exercise_id,
+                self._owner,
+                self._correct,
+                self._wrong,
+            ))
+        else:
+            query_db('UPDATE learn_stats SET exercise_id=?, owner=?, correct=?, wrong=? WHERE id=?', (
+                self._exercise_id,
+                self._owner,
+                self._correct,
+                self._wrong,
+                self._id,
+            ))
+
+    @staticmethod
+    def load(learn_stat_id):
+        """
+        loads a LearnStat from the database
+        :return: a new LearnStat instance
+        """
+        result = query_db('SELECT * FROM learn_stats WHERE id=?', (learn_stat_id,), True)
+        if not result:
+            raise KeyError(f"No LearnStat with the id #{learn_stat_id} has been found")
+        return LearnStat(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def exercise_id(self) -> str:
+        return self._exercise_id
+
+    @exercise_id.setter
+    def exercise_id(self, v: str) -> None:
+        self._exercise_id = v
+
+    @property
+    def owner(self) -> str:
+        return self._owner
+
+    @owner.setter
+    def owner(self, v: str) -> None:
+        self._owner = v
+
+    @property
+    def correct(self) -> int:
+        return self._correct
+
+    @correct.setter
+    def correct(self, v: int) -> None:
+        self._correct = v
+
+    @property
+    def wrong(self) -> int:
+        return self._wrong
+
+    @wrong.setter
+    def wrong(self, v: int) -> None:
+        self._wrong = v
+
+    def get_owner(self) -> User:
+        """
+        Get the owner as a User class
+        :return: instance of User
+        """
+        return User.load(self.owner)
+
+    def get_exercise(self) -> LearnExercise:
+        """
+        Get the exercise as a LearnExercise class
+        :return: instance of LearnExercise
+        """
+        return LearnExercise.load(self.exercise_id)
+
+
 if __name__ == '__main__':
     app.run()

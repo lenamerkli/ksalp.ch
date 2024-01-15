@@ -48,5 +48,12 @@ CREATE TABLE IF NOT EXISTS learn_exercises (
     answer TEXT NOT NULL,
     answers TEXT NOT NULL,
     frequency REAL NOT NULL,
-    auto_check INTEGER NOT NULL,
+    auto_check INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS learn_stats (
+    id TEXT PRIMARY KEY,
+    exercise_id TEXT NOT NULL,
+    owner TEXT NOT NULL,
+    correct INTEGER NOT NULL,
+    wrong INTEGER NOT NULL
 );

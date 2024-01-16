@@ -452,6 +452,112 @@ class User:
         return (self.payment - datetime.now()).seconds > 0
 
 
+class Comment:
+
+    def __init__(self, id_: str = None, content: str = '', author: str = '', subject: str = '', posted: datetime = None) -> None:
+        self._id = ''
+        self._content = ''
+        self._author = ''
+        self._subject = ''
+        self._posted = ''
+        if id_ is None:
+            id_ = rand_base64(11)
+        if posted is None:
+            posted = datetime.now()
+        self.id_ = id_
+        self.content = content
+        self.author = author
+        self.subject = subject
+        self.posted = posted
+
+    def __str__(self) -> str:
+        return f"Comment #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'content': self.content,
+            'author': self.author,
+            'subject': self.subject,
+            'posted': self.posted,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the comment in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No comment id')
+        if not query_db('SELECT * FROM comments WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO comments VALUES (?, ?, ?, ?, ?)', (
+                self._id,
+                self._content,
+                self._author,
+                self._subject,
+                self._posted,
+            ))
+        else:
+            query_db('UPDATE comments SET content=?, author=?, subject=?, posted=? WHERE id=?', (
+                self._content,
+                self._author,
+                self._subject,
+                self._posted,
+                self._id,
+            ))
+
+    @staticmethod
+    def load(comment_id):
+        """
+        loads a comment from the database
+        :return: a new comment instance
+        """
+        result = query_db('SELECT * FROM comments WHERE id=?', (comment_id,), True)
+        if not result:
+            raise KeyError(f"No comment with the id #{comment_id} has been found")
+        return Comment(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def content(self) -> str:
+        return self._content
+
+    @content.setter
+    def content(self, v: str) -> None:
+        self._content = v
+
+    @property
+    def author(self) -> str:
+        return self._author
+
+    @author.setter
+    def author(self, v: str) -> None:
+        self._author = v
+
+    @property
+    def subject(self) -> str:
+        return self._subject
+
+    @subject.setter
+    def subject(self, v: str) -> None:
+        self._subject = v
+
+    @property
+    def posted(self) -> datetime:
+        return datetime.strptime(self._posted, '%Y-%m-%d_%H-%M-%S')
+
+    @posted.setter
+    def posted(self, v: datetime) -> None:
+        self._posted = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+
 class Document:
 
     def __init__(self, id_: str = None, title: str = '', subject: str = '', description: str = '', class_: str = '',

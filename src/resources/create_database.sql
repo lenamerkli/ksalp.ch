@@ -14,6 +14,13 @@ CREATE TABLE IF NOT EXISTS users (
     class TEXT NOT NULL,
     grade TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS comments (
+    id TEXT PRIMARY KEY,
+    content TEXT NOT NULL,
+    author TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    posted TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS documents (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,

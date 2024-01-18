@@ -7,7 +7,7 @@
 
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from flask import Flask, g
-from os.path import join, exists
+from os.path import join, exists, dirname
 from os import urandom, environ
 from datetime import timedelta, datetime
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler, log as logging_log
@@ -83,7 +83,7 @@ def get_db() -> SQLite_Connection:
     """
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite_connect('database.db')
+        db = g._database = sqlite_connect('database.sqlite')
     return db
 
 
@@ -113,6 +113,19 @@ def query_db(query, args=(), one=False) -> list | tuple:
     conn.commit()
     cur.close()
     return (result[0] if result else None) if one else result
+
+
+def relative_path(path: str) -> str:
+    return str(join(dirname(__file__), path))
+
+
+with app.app_context():
+    with open(relative_path('resources/create_database.sql'), 'r') as f:
+        _create_db = f.read()
+    _conn = get_db()
+    _conn.executescript(_create_db)
+    _conn.commit()
+    _conn.close()
 
 
 ########################################################################################################################

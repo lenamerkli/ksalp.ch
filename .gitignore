@@ -3,6 +3,7 @@ recycle_bin/
 
 # databases containing private data
 *.db
+*.sqlite
 
 # backups containing parts of the databases mentioned above
 backups/

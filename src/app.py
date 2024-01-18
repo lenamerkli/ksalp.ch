@@ -10,7 +10,7 @@ from flask import Flask, g
 from os.path import join, exists, dirname
 from os import urandom, environ
 from datetime import timedelta, datetime
-from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler, log as logging_log
+from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
 from logging import INFO as LOG_INFO
 from base64 import urlsafe_b64encode, urlsafe_b64decode
@@ -467,7 +467,8 @@ class User:
 
 class Comment:
 
-    def __init__(self, id_: str = None, content: str = '', author: str = '', subject: str = '', posted: datetime = None) -> None:
+    def __init__(self, id_: str = None, content: str = '', author: str = '', subject: str = '',
+                 posted: datetime = None) -> None:
         self._id = ''
         self._content = ''
         self._author = ''
@@ -891,8 +892,8 @@ class LearnSet:
                 self._created,
             ))
         else:
-            query_db('UPDATE learn_sets SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, edited=?, '
-                     'created=? WHERE id=?', (
+            query_db('UPDATE learn_sets SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, '
+                     'edited=?, created=? WHERE id=?', (
                          self._title,
                          self._subject,
                          self._description,
@@ -1055,7 +1056,7 @@ class LearnExercise:
         if self._id is None:
             raise ValueError('No LearnExercise id')
         if not query_db('SELECT id FROM learn_exercises WHERE id=?', (self._id,), True):
-            query_db('INSERT INTO learn_exercises VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
+            query_db('INSERT INTO learn_exercises VALUES (?, ?, ?, ?, ?, ?, ?)', (
                 self._id,
                 self._set_id,
                 self._question,

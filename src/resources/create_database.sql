@@ -64,3 +64,7 @@ CREATE TABLE IF NOT EXISTS learn_stats (
     correct INTEGER NOT NULL,
     wrong INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS used_ids (
+    id TEXT PRIMARY KEY,
+    created TEXT NOT NULL
+);

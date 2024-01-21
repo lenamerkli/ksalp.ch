@@ -16,6 +16,8 @@ from logging import INFO as LOG_INFO
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import pbkdf2_hmac
 from werkzeug.utils import secure_filename
+from json import loads, dumps
+from random import randint
 
 from resources import *
 
@@ -1268,6 +1270,103 @@ class LearnStat:
         :return: instance of LearnExercise
         """
         return LearnExercise.load(self.exercise_id)
+
+
+class MailCheck:
+
+    def __init__(self, id_: str = None, account: dict = None, valid: datetime = None, code: str = None):
+        self._id = ''
+        self._account = ''
+        self._valid = ''
+        self._code = ''
+        if id_ is None:
+            id_ = rand_base64(12)
+        if account is None:
+            account = {}
+        if valid is None:
+            valid = datetime.now() + timedelta(minutes=15)
+        if code is None:
+            code = str(randint(10 ** 7, 10 ** 8 - 1))
+        self.id_ = id_
+        self.account = account
+        self.valid = valid
+        self.code = code
+
+    def __str__(self) -> str:
+        return f"MailCheck #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'account': self.account,
+            'valid': self.valid,
+            'code': self.code,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the MailCheck in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No MailCheck id')
+        if not query_db('SELECT id FROM mail_check WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO mail_check VALUES (?, ?, ?, ?)', (
+                self._id,
+                self._account,
+                self._valid,
+                self._code,
+            ))
+        else:
+            query_db('UPDATE mail_check SET account=?, valid=?, code=? WHERE id=?', (
+                self._account,
+                self._valid,
+                self._code,
+                self._id,
+            ))
+
+    @staticmethod
+    def load(mail_check_id):
+        """
+        loads a MailCheck from the database
+        :return: a new MailCheck instance
+        """
+        result = query_db('SELECT * FROM mail_check WHERE id=?', (mail_check_id,), True)
+        if not result:
+            raise KeyError(f"No MailCheck with the id #{mail_check_id} has been found")
+        return MailCheck(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def account(self) -> dict:
+        return loads(self._account)
+
+    @account.setter
+    def account(self, v: dict) -> None:
+        self._account = dumps(v)
+
+    @property
+    def valid(self) -> datetime:
+        return datetime.strptime(self._valid, '%Y-%m-%d_%H-%M-%S')
+
+    @valid.setter
+    def valid(self, v: datetime) -> None:
+        self._valid = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    @property
+    def code(self) -> str:
+        return self._code
+
+    @code.setter
+    def code(self, v: str) -> None:
+        self._code = v
 
 
 if __name__ == '__main__':

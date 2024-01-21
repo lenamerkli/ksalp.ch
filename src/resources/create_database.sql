@@ -64,6 +64,12 @@ CREATE TABLE IF NOT EXISTS learn_stats (
     correct INTEGER NOT NULL,
     wrong INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS mail_check (
+    id TEXT PRIMARY KEY,
+    account TEXT NOT NULL,
+    valid TEXT NOT NULL,
+    code TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS used_ids (
     id TEXT PRIMARY KEY,
     created TEXT NOT NULL

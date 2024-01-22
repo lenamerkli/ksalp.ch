@@ -64,6 +64,12 @@ CREATE TABLE IF NOT EXISTS learn_stats (
     correct INTEGER NOT NULL,
     wrong INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS login(
+    id TEXT PRIMARY KEY,
+    account TEXT NOT NULL,
+    valid TEXT NOT NULL,
+    browser TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS mail_check (
     id TEXT PRIMARY KEY,
     account TEXT NOT NULL,

@@ -1369,5 +1369,98 @@ class MailCheck:
         self._code = v
 
 
+class Login:
+
+    def __init__(self, id_: str = None, account: str = '', valid: datetime = None, browser: str = '') -> None:
+        self._id = ''
+        self._account = ''
+        self._valid = ''
+        self._browser = ''
+        if id_ is None:
+            id_ = rand_base64(64)
+        if valid is None:
+            valid = datetime.now() + timedelta(days=100)
+        self.id_ = id_
+        self.account = account
+        self.valid = valid
+        self.browser = browser
+
+    def __str__(self) -> str:
+        return f"Login #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'account': self.account,
+            'valid': self.valid,
+            'browser': self.browser,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the Login in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No Login id')
+        if not query_db('SELECT id FROM login WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO login VALUES (?, ?, ?, ?)', (
+                self._id,
+                self._account,
+                self._valid,
+                self._browser,
+            ))
+        else:
+            query_db('UPDATE login SET account=?, valid=?, browser=? WHERE id=?', (
+                self._account,
+                self._valid,
+                self._browser,
+                self._id,
+            ))
+
+    @staticmethod
+    def load(login_id):
+        """
+        loads a Login from the database
+        :return: a new Login instance
+        """
+        result = query_db('SELECT * FROM login WHERE id=?', (login_id,), True)
+        if not result:
+            raise KeyError(f"No Login with the id #{login_id} has been found")
+        return Login(*result)
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def account(self) -> str:
+        return self._account
+
+    @account.setter
+    def account(self, v: str) -> None:
+        self._account = v
+
+    @property
+    def valid(self) -> datetime:
+        return datetime.strptime(self._valid, '%Y-%m-%d_%H-%M-%S')
+
+    @valid.setter
+    def valid(self, v: datetime) -> None:
+        self._valid = v.strftime('%Y-%m-%d_%H-%M-%S')
+
+    @property
+    def browser(self) -> str:
+        return self._browser
+
+    @browser.setter
+    def browser(self, v: str) -> None:
+        self._browser = v
+
+
 if __name__ == '__main__':
     app.run()

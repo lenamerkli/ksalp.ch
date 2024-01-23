@@ -6,7 +6,7 @@
 
 
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
-from flask import Flask, g
+from flask import Flask, g, session, request
 from os.path import join, exists, dirname
 from os import urandom, environ
 from datetime import timedelta, datetime
@@ -196,6 +196,10 @@ def hash_password(password: str, salt: bytes):
         salt=salt,
         iterations=int(environ['HASH_ITERATIONS']),
     )
+
+
+def extract_browser(agent):
+    return f"{agent.platform}-{agent.browser}"
 
 
 ########################################################################################################################
@@ -1460,6 +1464,19 @@ class Login:
     @browser.setter
     def browser(self, v: str) -> None:
         self._browser = v
+
+
+def login_required(func):
+    def wrapper(*args, **kwargs):
+        r = {'error': 'account required'}, 401
+        if 'account' in session:
+            try:
+                login = Login.load(session['account'])
+            except Exception:
+                return r
+            if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
+                return func(*args, **kwargs)
+        return r
 
 
 if __name__ == '__main__':

@@ -1477,6 +1477,7 @@ def login_required(func):
             if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
                 return func(*args, **kwargs)
         return r
+    return wrapper
 
 
 if __name__ == '__main__':

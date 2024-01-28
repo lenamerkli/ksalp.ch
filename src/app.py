@@ -272,6 +272,25 @@ class User:
             'grade': self.grade,
         }
 
+    @property
+    def json(self) -> dict:
+        return {
+            'id_': self.id_,
+            'name': self.name,
+            'mail': self.mail,
+            'salt': urlsafe_b64encode(self.salt).decode(),
+            'hash_': urlsafe_b64encode(self.hash_).decode(),
+            'newsletter': self.newsletter,
+            'created': self.created.isoformat(),
+            'theme': self.theme,
+            'iframe': self.iframe,
+            'payment': self.payment,
+            'banned': self.banned,
+            'search': self.search,
+            'classes': self.classes,
+            'grade': self.grade,
+        }
+
     def save(self) -> None:
         """
         Saves the user in the database.
@@ -1478,6 +1497,19 @@ def login_required(func):
                 return func(*args, **kwargs)
         return r
     return wrapper
+
+
+@app.route('/api/v1/account', methods=['GET'])
+def r_api_v1_account():
+    r = {'valid': False, 'info': {}}
+    try:
+        login = Login.load(session['account'])
+        if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
+            user = User.load(login.account)
+            r = {'valid': True, 'info': user.json}
+    except Exception:
+        return {'valid': False, 'info': {}}
+    return r
 
 
 if __name__ == '__main__':

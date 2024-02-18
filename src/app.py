@@ -6,7 +6,7 @@
 
 
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
-from flask import Flask, g, session, request
+from flask import Flask, g, session, request, send_from_directory
 from os.path import join, exists, dirname
 from os import urandom, environ
 from datetime import timedelta, datetime
@@ -1497,6 +1497,21 @@ def login_required(func):
                 return func(*args, **kwargs)
         return r
     return wrapper
+
+
+########################################################################################################################
+# ROUTES
+########################################################################################################################
+
+
+@app.route('/static/<path:file>', methods=['GET'])
+def route_src(file):
+    resp = send_from_directory(join(app.root_path, 'src'), file)
+    if file in FILE_TYPES:
+        resp.mimetype = FILE_TYPES[file]
+    else:
+        resp.mimetype = 'text/plain'
+    return resp
 
 
 @app.route('/api/v1/account', methods=['GET'])

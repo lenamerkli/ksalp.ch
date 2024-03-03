@@ -1505,7 +1505,7 @@ def login_required(func):
 
 
 @app.route('/static/<path:file>', methods=['GET'])
-def route_src(file):
+def route_static(file):
     resp = send_from_directory(join(app.root_path, 'src'), file)
     if file in FILE_TYPES:
         resp.mimetype = FILE_TYPES[file]

@@ -1507,10 +1507,7 @@ def login_required(func):
 @app.route('/static/<path:file>', methods=['GET'])
 def route_static(file):
     resp = send_from_directory(join(app.root_path, 'src'), file)
-    if file in FILE_TYPES:
-        resp.mimetype = FILE_TYPES[file]
-    else:
-        resp.mimetype = 'text/plain'
+    resp.mimetype = FILE_TYPES.get(file, 'text/plain')
     return resp
 
 
@@ -1523,7 +1520,7 @@ def r_api_v1_account():
             user = User.load(login.account)
             r = {'valid': True, 'info': user.json}
     except Exception:
-        return {'valid': False, 'info': {}}
+        r = {'valid': False, 'info': {}}
     return r
 
 

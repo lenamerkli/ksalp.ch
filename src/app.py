@@ -6,7 +6,7 @@
 
 
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
-from flask import Flask, g, session, request, send_from_directory
+from flask import Flask, g, session, request, Response, send_from_directory
 from os.path import join, exists, dirname
 from os import urandom, environ
 from datetime import timedelta, datetime
@@ -18,6 +18,7 @@ from hashlib import pbkdf2_hmac
 from werkzeug.utils import secure_filename
 from json import loads, dumps
 from random import randint
+from requests import request as requests_send
 
 from resources import *
 
@@ -1504,6 +1505,12 @@ def login_required(func):
 ########################################################################################################################
 
 
+@app.before_request
+def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(days=92)
+
+
 @app.route('/static/<path:file>', methods=['GET'])
 def route_static(file):
     resp = send_from_directory(join(app.root_path, 'src'), file)
@@ -1524,5 +1531,25 @@ def r_api_v1_account():
     return r
 
 
+@app.errorhandler(404)
+def error_handler_404(*_, **__):
+    res = requests_send(
+        method=request.method,
+        url='http://' + request.url.replace(request.host_url, f'localhost:4200/'),  # noqa
+        headers={k: v for k, v in request.headers if k.lower() != 'host'},
+        data=request.get_data(),
+        cookies=request.cookies,
+        allow_redirects=True,
+    )
+    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding',
+                        'connection']
+    headers = [
+        (k, v) for k, v in res.raw.headers.items()
+        if k.lower() not in excluded_headers
+    ]
+    response = Response(res.content, res.status_code, headers)  # noqa
+    return response
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0', port=5000, debug=False)

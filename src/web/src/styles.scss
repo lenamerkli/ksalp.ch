@@ -1,1 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  src: url("/static/fonts/Montserrat-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: italic;
+  src: url("/static/fonts/Montserrat-MediumItalic.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Montserrat Bold";
+  font-style: normal;
+  src: url("/static/fonts/Montserrat-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Montserrat Bold";
+  font-style: italic;
+  src: url("/static/fonts/Montserrat-BoldItalic.ttf") format("truetype");
+}
+body{
+  font-family: "Montserrat", "Segoe UI", SegoeUI, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  z-index: 0;
+}

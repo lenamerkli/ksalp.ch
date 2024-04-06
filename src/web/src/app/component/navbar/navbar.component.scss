@@ -1,0 +1,32 @@
+.mobile{
+  @media (min-width: calc(35em + 1px)) {
+    display: none;
+  }
+}
+.close-icon{
+  color: #000000;
+  &:hover{
+    color: #444444;
+  }
+}
+.desktop{
+  @media (max-width: 35em) {
+    display: none;
+  }
+  img{
+    width: 12em;
+  }
+}
+.mat-accordion{
+  max-width: 50vw;
+}
+.navbar {
+  @media (max-width: 35em) {
+    width: 100vw;
+  }
+}
+.navbar-whitespace{
+  @media (min-width: calc(35em + 1px)) {
+    margin-top: 3em;
+  }
+}

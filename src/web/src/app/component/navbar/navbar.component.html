@@ -1,0 +1,76 @@
+<!--suppress HtmlUnknownTarget -->
+<div class="navbar">
+  <p class="mobile mobile-account">
+    <a routerLink="#" (click)="closeMobile.emit()">
+      <mat-icon class="close-icon">close</mat-icon>
+    </a>
+    <span *ngIf="account !== null && account?.isValid()">
+      Angemeldet als <i>{{account.getName()}}</i>
+    </span>
+    <span *ngIf="account === null || !(account?.isValid())">
+      Nicht angemeldet
+    </span>
+  </p>
+  <p class="desktop">
+    <a routerLink="/">
+      <img src="/static/logo.svg" alt="ksalp.ch">
+    </a>
+  </p>
+  <mat-accordion [multi]="false" class="mat-accordion">
+    <app-navbar-link link="/">Hauptseite</app-navbar-link>
+    <mat-divider></mat-divider>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Dokumente
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-accordion [multi]="false">
+        <app-navbar-link link="/dokumente">Alle</app-navbar-link>
+        <app-navbar-link *ngFor="let element of account?.getClasses()" link="/dokumente?zeige={{element}}">{{element}}</app-navbar-link>
+      </mat-accordion>
+    </mat-expansion-panel>
+    <mat-divider></mat-divider>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Lernsets
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-accordion [multi]="false">
+        <app-navbar-link link="/lernsets">Alle</app-navbar-link>
+        <app-navbar-link *ngFor="let element of account?.getClasses()" link="/lernsets?zeige={{element}}">{{element}}</app-navbar-link>
+      </mat-accordion>
+    </mat-expansion-panel>
+    <mat-divider></mat-divider>
+    <app-navbar-link link="/blog">Blog</app-navbar-link>
+    <br class="navbar-whitespace">
+    <div *ngIf="account?.isValid()">
+      <app-navbar-link link="/abmelden">Abmelden</app-navbar-link>
+      <mat-divider></mat-divider>
+      <app-navbar-link link="/einstellungen">Einstellungen</app-navbar-link>
+    </div>
+    <div *ngIf="!(account?.isValid())">
+      <app-navbar-link link="/anmelden">Anmelden</app-navbar-link>
+      <mat-divider></mat-divider>
+      <app-navbar-link link="/registrieren">Registrieren</app-navbar-link>
+    </div>
+    <mat-divider></mat-divider>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Über ksalp.ch
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-accordion [multi]="false">
+        <app-navbar-link link="/über/team">Das Team</app-navbar-link>
+        <app-navbar-link link="/über/kontakt">Kontakt</app-navbar-link>
+        <app-navbar-link link="/über/quellcode">Quellcode</app-navbar-link>
+        <app-navbar-link link="/über/finanzen">Finanzen</app-navbar-link>
+        <app-navbar-link link="/impressum">Impressum</app-navbar-link>
+        <app-navbar-link link="/datenschutz">Datenschutz</app-navbar-link>
+        <app-navbar-link link="/agb">AGB</app-navbar-link>
+      </mat-accordion>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

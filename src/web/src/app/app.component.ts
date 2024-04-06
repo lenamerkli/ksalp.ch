@@ -9,7 +9,13 @@ import {MatIcon} from "@angular/material/icon";
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent, MatIcon, RouterLink],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    NavbarComponent,
+    MatIcon,
+    RouterLink,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -19,5 +25,22 @@ export class AppComponent {
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
       this.account = value;
     })
+  }
+  open_mobile(){
+    let navbar = document.getElementById('navbar');
+    if(navbar){
+      navbar.style.display = 'block';
+    }
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    })
+  }
+  close_mobile(){
+    let navbar = document.getElementById('navbar');
+    if(navbar){
+      navbar.style.display = '';
+    }
   }
 }

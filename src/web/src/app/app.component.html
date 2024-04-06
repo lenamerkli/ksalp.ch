@@ -1,17 +1,18 @@
+<!--suppress HtmlUnknownTarget -->
 <div class="main">
   <div class="warning">
     <h2>Diese Webseite befindet sich in der Test-Phase und sollte noch nicht genutzt werden.</h2>
   </div>
   <div class="header">
     <p>
-      <a routerLink="#" class="link"><mat-icon class="menu-icon">menu</mat-icon></a>
+      <a routerLink="#" class="link" (click)="open_mobile()"><mat-icon class="menu-icon">menu</mat-icon></a>
       <a routerLink="/">
         <img src="/static/logo.svg" alt="ksalp.ch">
       </a>
     </p>
   </div>
-  <div class="navbar">
-    <app-navbar></app-navbar>
+  <div class="navbar" id="navbar">
+    <app-navbar (closeMobile)="close_mobile()"></app-navbar>
   </div>
   <!--
   <div class="account">
@@ -24,12 +25,14 @@
     <div class="router">
       <router-outlet></router-outlet>
     </div>
-    <div class="footer">
-      <p class="footer-text"><span class="footer-inner">Mit &#9825; bereitgestellt vom <a class="footer-link" href="/über/team">ksalp.ch Team</a> &emsp;|&emsp;
-        <a href="/" class="footer-link">Impressum</a>&emsp;|&emsp;
-        <a href="/datenschutz" class="footer-link">Datenschutz</a>&emsp;|&emsp;
-        <a href="/" class="footer-link">Allgemeine Geschäftsbedingungen</a>
-      </span></p>
+    <div class="footer" ngPreserveWhitespaces>
+      <p class="footer-text">
+        <span class="footer-inner">Mit &#9825; bereitgestellt vom <a class="footer-link" href="/über/team">ksalp.ch Team</a>&emsp;|&emsp;
+          <a href="/" class="footer-link">Impressum</a>&emsp;|&emsp;
+          <a href="/datenschutz" class="footer-link">Datenschutz</a>&emsp;|&emsp;
+          <a href="/" class="footer-link">Allgemeine Geschäftsbedingungen</a>
+        </span>
+      </p>
     </div>
   </div>
 </div>

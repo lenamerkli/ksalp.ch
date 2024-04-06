@@ -48,7 +48,7 @@ router-outlet{
     margin: 0;
     padding: 1em;
     min-height: 1.5em;
-    background-color: #dddddd;
+    background-color: #cccccc;
     color: #000000;
     width: calc(100vw - 12em - 2 * 0.8em - 2em);
     @media (max-width: 35em) {
@@ -59,10 +59,10 @@ router-outlet{
     font-size: 80%;
   }
   .footer-link{
-    color: #68c4ff;
+    color: #29a1f8;
     transition: all 0.5s ease-out;
     &:hover{
-      color: #539dcb;
+      color: #1f7fc4;
     }
   }
 }
@@ -71,6 +71,7 @@ router-outlet{
   padding: 0.2em 0.8em;
   min-height: calc(100vh - 2 * 0.2em);
   display: inline-block;
+  background-color: #e0e0e0;
   @media (max-width: 35em) {
     display: none;
     width: 100vw;
@@ -85,6 +86,11 @@ router-outlet{
   margin: 0;
   position: fixed;
   top: 0;
+  background-color: #e0e0e0;
+  p{
+    padding: 0.2em;
+    margin: 0;
+  }
   img{
     height: 1.7em;
     position: absolute;

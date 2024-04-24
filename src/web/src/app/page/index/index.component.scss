@@ -1,0 +1,26 @@
+.center{
+  text-align: justify;
+  text-align-last: center;
+}
+.main{
+  padding: 2em;
+  @media (max-width: 35em) {
+    padding: 0;
+  }
+}
+h1{
+  padding: 0;
+  margin: -1em 0 0;
+  font-size: 2.4em;
+  text-align: center;
+}
+ul{
+  list-style: none;
+  display: inline-flex;
+}
+.ul-container{
+  text-align: center;
+  li{
+    margin: 0 0.5em;
+  }
+}

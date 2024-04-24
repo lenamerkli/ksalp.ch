@@ -1,0 +1,28 @@
+<div class="main">
+  @if (!(account === null) && !(account.isValid())){
+    <h1>Willkommen auf ksalp.ch</h1>
+    <p class="center">
+      ksalp.ch ist eine Lernplattform für Lernende von Lernenden der Kantonsschule Alpenquai Luzern. Lernende von anderen Gymnasien sind hier auch herzlich willkommen.
+      Diese Plattform lebt von den Beiträgen der Nutzenden.
+      Diese Dienstleistung ist kostenlos und werbefrei.
+      Damit das auch weiter so bleibt, sind wir auf Spenden und Einnahmen durch das Premium-Abo angewiesen.
+      Mit einem Premium-Abonnement erhalten Sie zusätzliche Funktionen, wie weitere Farbschemen, und Sie unterstützen ksalp.ch.
+      Das Betreiben einer Webseite ist nicht günstig; ausserdem werden hunderte Arbeitsstunden investiert.
+      Die Lite-Version dieses Abonnements kostet nur 4 Franken pro Jahr, die Vollversion 20 Franken.
+      Kontaktieren Sie uns, falls Sie uns unterstützen möchten.
+    </p>
+    <div class="ul-container">
+      <ul>
+        <li>
+          <a mat-raised-button color="primary" routerLink="/anmelden">Anmelden</a>
+        </li>
+        <li>
+          <a mat-raised-button color="primary" routerLink="/registrieren">Registrieren</a>
+        </li>
+        <li>
+          <a mat-raised-button color="primary" routerLink="/über/kontakt">Kontakt</a>
+        </li>
+      </ul>
+    </div>
+  }
+</div>

@@ -45,12 +45,12 @@
     <mat-divider></mat-divider>
     <app-navbar-link link="/blog">Blog</app-navbar-link>
     <br class="navbar-whitespace">
-    <div *ngIf="account?.isValid()">
+    <div *ngIf="!(account === null) && account.isValid()">
       <app-navbar-link link="/abmelden">Abmelden</app-navbar-link>
       <mat-divider></mat-divider>
       <app-navbar-link link="/einstellungen">Einstellungen</app-navbar-link>
     </div>
-    <div *ngIf="!(account?.isValid())">
+    <div *ngIf="!(account === null) && !(account.isValid())">
       <app-navbar-link link="/anmelden">Anmelden</app-navbar-link>
       <mat-divider></mat-divider>
       <app-navbar-link link="/registrieren">Registrieren</app-navbar-link>

@@ -20,6 +20,8 @@ EXTENSIONS = {
     'application/zip': 'ZIP',
     'audio/mpeg': 'MP3',
     'audio/webm': 'WEBA',
+    'font/ttf': 'TTF',
+    'font/woff2': 'WOFF2',
     'image/gif': 'GIF',
     'image/jpeg': 'JPG',
     'image/png': 'PNG',

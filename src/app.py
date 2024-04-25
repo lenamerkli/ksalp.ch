@@ -8,7 +8,7 @@
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from flask import Flask, g, session, request, Response, send_from_directory
 from os.path import join, exists, dirname
-from os import urandom, environ
+from os import urandom, environ, listdir
 from datetime import timedelta, datetime
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
@@ -19,6 +19,7 @@ from werkzeug.utils import secure_filename
 from json import loads, dumps
 from random import randint
 from requests import request as requests_send
+from urllib.parse import urlparse
 
 from resources import *
 
@@ -1529,6 +1530,38 @@ def r_api_v1_account():
     except Exception:
         r = {'valid': False, 'info': {}}
     return r
+
+
+@app.route('/api/v1/favicon/<path:path>')
+# @login_required
+def r_api_v1_favicon(path: str):
+    if not path.startswith('http'):
+        path = f"http://{path}"  # noqa
+    if path.count('/') < 3:
+        path += '/'
+    path = path.lower()
+    parsed_uri = urlparse(path)
+    website = parsed_uri.netloc
+    for file in listdir(relative_path('favicons/')):
+        if file.rsplit('.', 1)[0].lower() == website.lower():
+            resp = send_from_directory(relative_path('favicons'), file)
+            extension = file.split('.')[-1]
+            if extension in EXTENSIONS_REVERSE:
+                resp.mimetype = EXTENSIONS_REVERSE[extension.upper()]
+            return resp
+    if website:
+        response = requests_send('GET', f"{environ['FAVICON_API']}{website}?s=256")
+        mimetype = response.headers.get('Content-Type', 'image/x-icon')
+        content = response.content
+        if response.status_code == 200:
+            with open(relative_path(f"favicons/{website}.{EXTENSIONS.get(mimetype, 'ICO').lower()}"), 'wb') as new_file:
+                new_file.write(content)
+            resp = Response(content, 200)
+            resp.mimetype = mimetype
+            return resp
+    resp = send_from_directory(relative_path('favicons'), '_empty.png')
+    resp.mimetype = EXTENSIONS_REVERSE['PNG']
+    return resp
 
 
 @app.errorhandler(404)

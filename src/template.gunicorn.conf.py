@@ -14,5 +14,6 @@ environ['HASH_PEPPER_1'] = ''
 environ['HASH_PEPPER_2'] = ''
 environ['HASH_ITERATIONS'] = ''
 environ['KSALP_ADMINS'] = ''
+environ['FAVICON_API'] = ''
 
 gunicorn.SERVER = 'nginx/gunicorn (ksalp.ch)'

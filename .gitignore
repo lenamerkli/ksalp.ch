@@ -12,6 +12,7 @@ backups/
 # private login data
 gunicorn.conf.py
 key.bin
+.env
 
 # not usable on other computers
 venv/

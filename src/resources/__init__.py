@@ -1,3 +1,5 @@
+import string as _string
+
 EXTENSIONS = {
     'application/gzip': 'GZ',
     'application/json': 'JSON',
@@ -22,6 +24,7 @@ EXTENSIONS = {
     'image/jpeg': 'JPG',
     'image/png': 'PNG',
     'image/webp': 'WEBP',
+    'image/x-icon': 'ICO',
     'text/css': 'CSS',
     'text/csv': 'CSV',
     'text/html': 'HTML',
@@ -31,6 +34,7 @@ EXTENSIONS = {
     'video/mpeg': 'MPEG',
     'video/webm': 'WEBM',
 }
+EXTENSIONS_REVERSE = {value: key for key, value in EXTENSIONS.items()}
 FILE_TYPES = {
 }
 GRADES = [

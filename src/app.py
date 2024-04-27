@@ -17,9 +17,10 @@ from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import pbkdf2_hmac
 from werkzeug.utils import secure_filename
 from json import loads, dumps
-from random import randint
+from random import randint, uniform as rand_uniform
 from requests import request as requests_send
 from urllib.parse import urlparse
+from time import sleep
 
 from resources import *
 
@@ -345,6 +346,17 @@ class User:
         result = query_db('SELECT * FROM users WHERE id=?', (user_id,), True)
         if not result:
             raise KeyError(f"No user with the id #{user_id} has been found")
+        return User(*result)
+
+    @staticmethod
+    def load_by_mail(user_mail):
+        """
+        loads a user from the database
+        :return: a new user instance
+        """
+        result = query_db('SELECT * FROM users WHERE mail=?', (user_mail,), True)
+        if not result:
+            raise KeyError(f"No user with mail `{user_mail}` has been found")
         return User(*result)
 
     @property
@@ -1533,7 +1545,7 @@ def r_api_v1_account():
 
 
 @app.route('/api/v1/favicon/<path:path>')
-# @login_required
+@login_required
 def r_api_v1_favicon(path: str):
     if not path.startswith('http'):
         path = f"http://{path}"  # noqa
@@ -1562,6 +1574,44 @@ def r_api_v1_favicon(path: str):
     resp = send_from_directory(relative_path('favicons'), '_empty.png')
     resp.mimetype = EXTENSIONS_REVERSE['PNG']
     return resp
+
+
+@app.route('/api/v1/account/signin', methods=['POST'])
+def r_api_v1_account_signin():
+    data = request.get_json(force=True, silent=True)
+    sleep(rand_uniform(0.1, 0.4))
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(i in data for i in [
+        'email',
+        'password',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `email`, `password`',
+        }, 415
+    try:
+        user = User.load_by_mail(data['email'])
+    except KeyError:
+        return {
+            'error': 'sign-in failed',
+            'message': 'The combination of password and email does not exist.'
+        }, 401
+    if not user.check_password(data['password']):
+        return {
+            'error': 'sign-in failed',
+            'message': 'The combination of password and email does not exist.'
+        }, 401
+    login = Login(account=user.id_, browser=extract_browser(request.user_agent))
+    login.save()
+    session['account'] = login.id_
+    return {
+        'status': 'success',
+        'message': 'You are now signed-in with cookies.'
+    }, 200
 
 
 @app.errorhandler(404)

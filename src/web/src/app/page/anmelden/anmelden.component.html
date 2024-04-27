@@ -1,0 +1,22 @@
+<div id="container">
+  <h2>Anmelden</h2>
+  <mat-form-field [style.width.em]="20">
+    <mat-label>E-Mail</mat-label>
+    <input matInput placeholder="vorname_nachname@sluz.ch" [formControl]="email" (blur)="updateErrorMessageEmail()" id="email">
+    @if (email.invalid) {
+      <mat-error>{{errorMessageEmail}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="20">
+    <mat-label>Password</mat-label>
+    <input type="password" [formControl]="password" matInput placeholder="****************" (blur)="updateErrorMessagePassword()" id="password">
+    @if (password.invalid){
+      <mat-error>{{errorMessagePassword}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <button mat-raised-button color="primary" (click)="continue()">Weiter</button>
+</div>

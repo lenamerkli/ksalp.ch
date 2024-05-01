@@ -1585,7 +1585,7 @@ def r_api_v1_account_signin():
             'error': 'json parse error',
             'message': 'JSON object could not be parsed.',
         }, 415
-    if not all(i in data for i in [
+    if not all(data.get(i, '') for i in [
         'email',
         'password',
     ]):

@@ -7,8 +7,9 @@ import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
-import {Account} from "../../type/account";
+import {Account, AccountDto} from "../../type/account";
 import {DefaultResponseDto} from "../../type/defaulf-response";
+import {AccountService} from "../../service/account.service";
 
 @Component({
   selector: 'app-anmelden',
@@ -32,6 +33,7 @@ export class AnmeldenComponent {
   constructor(
     private router: Router,
     private httpClient: HttpClient,
+    private accountService: AccountService,
   ) {
     merge(this.email.statusChanges, this.email.valueChanges)
       .pipe(takeUntilDestroyed())
@@ -66,6 +68,10 @@ export class AnmeldenComponent {
       })).subscribe({
           next: response => {
             if (response.status && response.status === 'success') {
+              this.httpClient.get<AccountDto>('/api/v1/account').subscribe((value: AccountDto) => {
+                let account = new Account(value);
+                this.accountService.getAccountInfo().next(account);
+              });
               this.router.navigate(['/']).then();
             } else {
               alert(response.message);

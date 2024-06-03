@@ -1,0 +1,81 @@
+<div id="container">
+  <h2>Registrieren</h2>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Name</mat-label>
+    <input matInput placeholder="Vorname Nachname" [formControl]="name" (blur)="updateErrorMessageName()" id="name">
+    @if (name.invalid) {
+      <mat-error>{{errorMessageName}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Klasse und Kursbezeichnungen</mat-label>
+    <input matInput placeholder="G19a SBC-5B" [formControl]="class_" (blur)="updateErrorMessageClass()" id="class_">
+    @if (class_.invalid) {
+      <mat-error>{{errorMessageClass}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Klassenstufe</mat-label>
+    <mat-select placeholder="" [formControl]="grade" (blur)="updateErrorMessageGrade()" id="grade">
+      @for (grade of ['-', '1', '2', '3', '4', '5', '6', '7']; track grade){
+        <mat-option [value]="grade">{{grade}}</mat-option>
+      }
+    </mat-select>
+    @if (grade.invalid) {
+      <mat-error>{{errorMessageGrade}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>E-Mail</mat-label>
+    <input matInput placeholder="vorname_nachname@sluz.ch" [formControl]="email" (blur)="updateErrorMessageEmail()" id="email">
+    @if (email.invalid) {
+      <mat-error>{{errorMessageEmail}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Password</mat-label>
+    <input matInput placeholder="****************" type="password" [formControl]="password" (keyup)="updateRating()" (blur)="updateErrorMessagePassword()" id="password">
+    @if (password.invalid){
+      <mat-error>{{errorMessagePassword}}</mat-error>
+    }
+    <mat-hint #rating>Sicherheit: {{ratingMessage}}</mat-hint>
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Password wiederholen</mat-label>
+    <input matInput placeholder="****************" type="password" [formControl]="passwordRepeat" (blur)="updateErrorMessagePasswordRepeat()" id="passwordRepeat">
+    @if (passwordRepeat.invalid){
+      <mat-error>{{errorMessagePasswordRepeat}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-checkbox [style.width.em]="24" (click)="updateErrorMessageTerms()" id="terms" color="primary" #terms>Ich habe die <a routerLink="/nutzungsbedingungen">Nutzungsbedingungen</a> gelesen und akzeptiere sie.</mat-checkbox>
+  @if (errorMessageTerms){
+    <mat-error [style.font-size]="'0.9em'">{{errorMessageTerms}}</mat-error>
+  } @else {
+    <mat-error></mat-error>
+  }
+  <br>
+  <mat-checkbox [style.width.em]="24" id="newsletter" color="primary" #newsletter>Ich möchte Neuigkeiten und Sicherheitsempfehlungen per E-Mail erhalten. (Optional)</mat-checkbox>
+  <br>
+  <br>
+  <button mat-raised-button color="primary" (click)="continue()">Weiter</button>
+  <br>
+  <br>
+  <p>* Pflichtfeld</p>
+  <br>
+  <div class="faq">
+    <h3>Was sind Kursbezeichnungen?</h3>
+    <p>Kursbezeichnungen sind (klassenübergreifende) Gruppen von Schüler*innen. Sie sind beim <a href="https://ksalpenquai.lu.ch/service/stundenplaene">Stundenplan</a> unten bei den Anmerkungen in der Zeile Text vermerkt. Bitte geben Sie nur die ersten beiden Teile ein; so wird aus SBC-5D-hal,hmr nur SBC-5D. Die Kursbezeichnungen ändern sich jedes Schuljahr.</p>
+  </div>
+</div>

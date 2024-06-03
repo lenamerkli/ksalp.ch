@@ -5,6 +5,8 @@
 ########################################################################################################################
 
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from flask import Flask, g, session, request, Response, send_from_directory
 from os.path import join, exists, dirname
@@ -12,17 +14,21 @@ from os import urandom, environ, listdir
 from datetime import timedelta, datetime
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
-from logging import INFO as LOG_INFO
+from logging import INFO as LOG_INFO, log as logging_log, ERROR as LOG_ERROR
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import pbkdf2_hmac
 from werkzeug.utils import secure_filename
 from json import loads, dumps
-from random import randint, uniform as rand_uniform
+from random import uniform as rand_uniform
 from requests import request as requests_send
+from smtplib import SMTP
+from ssl import create_default_context
 from urllib.parse import urlparse
 from time import sleep
+import typing as t
 
 from resources import *
+
 
 ########################################################################################################################
 # GENERAL SETUP
@@ -188,6 +194,46 @@ def rand_salt() -> str:
 
 
 ########################################################################################################################
+# E-MAIL
+#######################################################################################################################
+
+
+def send_mail(address: str, subject: str, message_plain: str, message: str) -> t.Union[Exception, None]:
+    """
+    Sends an e-mail to the specified address
+    :param address: e-mail address
+    :param subject: subject line
+    :param message_plain: plain text message
+    :param message: html message
+    :return: None if successful, Exception if not
+    """
+    smtp_server = environ['SMTP_SERVER']
+    smtp_port = int(environ['SMTP_PORT'])
+    sender_email = environ['SMTP_ADDRESS']
+    context = create_default_context()
+    server = None
+    m = MIMEMultipart('alternative')
+    m['Subject'] = subject
+    m['From'] = sender_email
+    m['To'] = address
+    part1 = MIMEText(message_plain, 'plain')
+    part2 = MIMEText(message, 'html')
+    m.attach(part1)
+    m.attach(part2)
+    try:
+        server = SMTP(smtp_server, smtp_port)
+        server.starttls(context=context)
+        server.login(sender_email, environ['SMTP_PASSWORD'])
+        server.sendmail(sender_email, address, m.as_string())
+    except Exception as error_:
+        logging_log(LOG_ERROR, error_)
+        return error_
+    finally:
+        server.quit()
+    return None
+
+
+########################################################################################################################
 # HASHING
 ########################################################################################################################
 
@@ -213,8 +259,8 @@ def extract_browser(agent):
 class User:
 
     def __init__(self, id_: str = None, name: str = '', mail: str = '', salt: bytes = b'', hash_: bytes = b'',
-                 newsletter: int = 0, created: datetime = None, theme: str = '', iframe: int = 0, payment: datetime = None,
-                 banned: list = None, search: str = 'startpage', classes: list = None, grade: str = '') -> None:
+                 newsletter: int = 0, created: datetime = None, theme: str = 'light', iframe: int = 0, payment: datetime = None,
+                 banned: list = None, search: str = 'Startpage', classes: list = None, grade: str = '-') -> None:
         self._id = ''
         self._name = ''
         self._mail = ''
@@ -222,11 +268,11 @@ class User:
         self._hash = ''
         self._newsletter = 0
         self._created = ''
-        self._theme = ''
+        self._theme = 'light'
         self._iframe = 0
         self._payment = ''
         self._banned = ''
-        self._search = 'startpage'
+        self._search = 'Startpage'
         self._classes = ''
         self._grade = ''
         if id_ is None:
@@ -234,11 +280,11 @@ class User:
         if created is None:
             created = datetime.now()
         if payment is None:
-            payment = datetime.strptime('2000-00-00', '%Y-%m-%d')
+            payment = datetime.strptime('2000-01-01', '%Y-%m-%d')
         if banned is None:
             banned = []
         if classes is None:
-            classes = None
+            classes = ['-']
         self.id_ = id_
         self.name = name
         self.mail = mail
@@ -346,7 +392,21 @@ class User:
         result = query_db('SELECT * FROM users WHERE id=?', (user_id,), True)
         if not result:
             raise KeyError(f"No user with the id #{user_id} has been found")
-        return User(*result)
+        user = User(id_=result[0])
+        user._name = result[1]
+        user._mail = result[2]
+        user._salt = result[3]
+        user._hash = result[4]
+        user._newsletter = result[5]
+        user._created = result[6]
+        user._theme = result[7]
+        user._iframe = result[8]
+        user._payment = result[9]
+        user._banned = result[10]
+        user._search = result[11]
+        user._classes = result[12]
+        user._grade = result[13]
+        return user
 
     @staticmethod
     def load_by_mail(user_mail):
@@ -357,7 +417,21 @@ class User:
         result = query_db('SELECT * FROM users WHERE mail=?', (user_mail,), True)
         if not result:
             raise KeyError(f"No user with mail `{user_mail}` has been found")
-        return User(*result)
+        user = User(id_=result[0])
+        user._name = result[1]
+        user._mail = result[2]
+        user._salt = result[3]
+        user._hash = result[4]
+        user._newsletter = result[5]
+        user._created = result[6]
+        user._theme = result[7]
+        user._iframe = result[8]
+        user._payment = result[9]
+        user._banned = result[10]
+        user._search = result[11]
+        user._classes = result[12]
+        user._grade = result[13]
+        return user
 
     @property
     def id_(self) -> str:
@@ -393,7 +467,7 @@ class User:
 
     @property
     def hash_(self) -> bytes:
-        return urlsafe_b64decode(self._salt)
+        return urlsafe_b64decode(self._hash)
 
     @hash_.setter
     def hash_(self, v: bytes) -> None:
@@ -476,7 +550,7 @@ class User:
 
     @grade.setter
     def grade(self, v: str) -> None:
-        if v not in GRADES.keys():
+        if v not in GRADES:
             raise ValueError(f"{v} is not a valid grade")
         self._grade = v
 
@@ -759,7 +833,7 @@ class Document:
 
     @grade.setter
     def grade(self, v: str) -> None:
-        if v not in GRADES.keys():
+        if v not in GRADES:
             raise ValueError(f"{v} is not a valid grade")
         self._grade = v
 
@@ -994,7 +1068,7 @@ class LearnSet:
 
     @grade.setter
     def grade(self, v: str) -> None:
-        if v not in GRADES.keys():
+        if v not in GRADES:
             raise ValueError(f"{v} is not a valid grade")
         self._grade = v
 
@@ -1323,7 +1397,7 @@ class MailCheck:
         if valid is None:
             valid = datetime.now() + timedelta(minutes=15)
         if code is None:
-            code = str(randint(10 ** 7, 10 ** 8 - 1))
+            code = rand_base64(16)
         self.id_ = id_
         self.account = account
         self.valid = valid
@@ -1371,7 +1445,26 @@ class MailCheck:
         result = query_db('SELECT * FROM mail_check WHERE id=?', (mail_check_id,), True)
         if not result:
             raise KeyError(f"No MailCheck with the id #{mail_check_id} has been found")
-        return MailCheck(*result)
+        mail_check = MailCheck(id_=result[0])
+        mail_check._account = result[1]
+        mail_check._valid = result[2]
+        mail_check._code = result[3]
+        return mail_check
+
+    @staticmethod
+    def load_by_code(mail_check_code: str):
+        """
+        loads a MailCheck from the database
+        :return: a new MailCheck instance
+        """
+        result = query_db('SELECT * FROM mail_check WHERE code=?', (mail_check_code,), True)
+        if not result:
+            raise KeyError(f"No MailCheck with the code #{mail_check_code} has been found")
+        mail_check = MailCheck(id_=result[0])
+        mail_check._account = result[1]
+        mail_check._valid = result[2]
+        mail_check._code = result[3]
+        return mail_check
 
     @property
     def id_(self) -> str:
@@ -1464,7 +1557,11 @@ class Login:
         result = query_db('SELECT * FROM login WHERE id=?', (login_id,), True)
         if not result:
             raise KeyError(f"No Login with the id #{login_id} has been found")
-        return Login(*result)
+        login = Login(id_=result[0])
+        login._account = result[1]
+        login._valid = result[2]
+        login._browser = result[3]
+        return login
 
     @property
     def id_(self) -> str:
@@ -1611,6 +1708,110 @@ def r_api_v1_account_signin():
     return {
         'status': 'success',
         'message': 'You are now signed-in with cookies.'
+    }, 200
+
+
+@app.route('/api/v1/account/register', methods=['POST'])
+def r_api_v1_account_register():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'name',
+        'class_',
+        'grade',
+        'email',
+        'password',
+        'newsletter',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: '
+                       '`name`, `class_`, `grade`, `email`, `password`, `newsletter`',
+        }, 415
+    if not (data['email'].endswith('@sluz.ch') or data['email'].endswith('@ksalp.ch')):
+        return {
+            'error': 'invalid email provider',
+            'message': 'Please use an email from sluz.ch or ksalp.ch.',
+        }, 400
+    db_result = query_db('SELECT * FROM users WHERE mail=?', (data['email'],), True)
+    if db_result:
+        return {
+            'error': 'email already in use',
+            'message': 'An account with this email address already exists.',
+        }, 400
+    salt = rand_salt()
+    account = {'name': data['name'], 'classes': data['class_'].split(' '), 'grade': data['grade'], 'mail': data['email'],
+               'newsletter': data['newsletter'], 'salt': salt,
+               'hash_': urlsafe_b64encode(hash_password(data['password'], urlsafe_b64decode(salt))).decode()}
+    mail = MailCheck(account=account, valid=datetime.now() + timedelta(minutes=15))
+    mail.save()
+    mail_plain = f"""Guten Tag, {data['name']}
+    
+    Um die Registrierung bei ksalp.ch abzuschliessen, klicken Sie bitte auf den folgenden Link:
+    
+    https://ksalp.ch/registrieren/mail/{mail.code}
+    
+    Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.
+    
+    Das ksalp.ch Team wünscht Ihnen viel Erfolg beim lernen.
+    """
+    mail_html = f"""<p>Guten Tag, {data['name']}</p>
+    <p>Um die Registrierung bei ksalp.ch abzuschliessen, klicken Sie bitte auf den folgenden Link:</p>
+    <p><b><a href="https://ksalp.ch/registrieren/mail/{mail.code}">https://ksalp.ch/registrieren/mail/{mail.code}</a></b></p>
+    <p>Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.</p>
+    <p>Das ksalp.ch Team wünscht Ihnen viel Erfolg beim lernen.</p>
+    """
+    result = send_mail(address=data['email'], subject='Registrierung bei ksalp.ch', message_plain=mail_plain, message=mail_html)
+    if result is not None:
+        return {
+            'error': 'exception during email delivery',
+            'message': 'An error occurred while sending the e-mail. Please try again later or contact us.',
+        }, 500
+    return {
+        'status': 'success',
+        'message': 'An email has been sent to your inbox.'
+    }, 200
+
+
+@app.route('/api/v1/account/register/continue', methods=['POST'])
+def r_api_v1_account_register_continue():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'code',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `code`',
+        }, 415
+    mail = MailCheck.load_by_code(mail_check_code=data['code'])
+    if mail is None:
+        return {
+            'error': 'invalid code',
+            'message': 'The code could not be found.',
+        }, 400
+    if mail.valid < datetime.now():
+        return {
+            'error': 'expired code',
+            'message': 'The code has expired.',
+        }, 400
+    account_data = mail.account
+    account_data['salt'] = urlsafe_b64decode(account_data['salt'])
+    account_data['hash_'] = urlsafe_b64decode(account_data['hash_'])
+    account_data['theme'] = 'light'
+    account = User(**account_data)
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Account created successfully.'
     }, 200
 
 

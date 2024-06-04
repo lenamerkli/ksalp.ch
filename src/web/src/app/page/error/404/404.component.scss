@@ -1,0 +1,17 @@
+img{
+  width: 40vw;
+  @media (max-width: 42em) {
+    width: 75vw;
+    margin-top: -2em;
+    margin-bottom: -1.5em;
+  }
+}
+p{
+  font-size: 1.5em;
+  @media (max-width: 42em) {
+    max-width: 75vw;
+  };
+  @media (min-width: calc(42em + 1px)) {
+    max-width: 60vw;
+  };
+}

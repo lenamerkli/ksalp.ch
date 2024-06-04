@@ -6,6 +6,7 @@ import {WeiterComponent} from "./page/registrieren/weiter/weiter.component";
 import {MailComponent} from "./page/registrieren/mail/mail.component";
 import {FertigComponent} from "./page/registrieren/fertig/fertig.component";
 import {AbmeldenComponent} from "./page/abmelden/abmelden.component";
+import {_404Component} from "./page/error/404/404.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -15,4 +16,5 @@ export const routes: Routes = [
   {path: 'registrieren/weiter', component: WeiterComponent},
   {path: 'registrieren/fertig', component: FertigComponent},
   {path: 'registrieren/mail/:mail_code', component: MailComponent},
+  {path: '**', component: _404Component},
 ];

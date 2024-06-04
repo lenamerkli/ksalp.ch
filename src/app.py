@@ -1815,6 +1815,24 @@ def r_api_v1_account_register_continue():
     }, 200
 
 
+@app.route('/api/v1/account/logout', methods=['POST'])
+def r_api_v1_account_logout():
+    try:
+        login = Login.load(session['account'])
+    except Exception:
+        return {
+            'error': 'invalid account login',
+            'message': 'The account login could not be found.',
+        }
+    login.valid = datetime.now()
+    login.save()
+    session['account'] = ''
+    return {
+        'status': 'success',
+        'message': 'Account logged out successfully.'
+    }, 200
+
+
 @app.errorhandler(404)
 def error_handler_404(*_, **__):
     res = requests_send(

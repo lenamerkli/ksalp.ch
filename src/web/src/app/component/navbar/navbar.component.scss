@@ -1,5 +1,5 @@
 .mobile{
-  @media (min-width: calc(35em + 1px)) {
+  @media (min-width: calc(42em + 1px)) {
     display: none;
   }
 }
@@ -10,7 +10,7 @@
   }
 }
 .desktop{
-  @media (max-width: 35em) {
+  @media (max-width: 42em) {
     display: none;
   }
   img{
@@ -21,12 +21,12 @@
   max-width: 50vw;
 }
 .navbar {
-  @media (max-width: 35em) {
+  @media (max-width: 42em) {
     width: 100vw;
   }
 }
 .navbar-whitespace{
-  @media (min-width: calc(35em + 1px)) {
+  @media (min-width: calc(42em + 1px)) {
     margin-top: 6em;
   }
 }

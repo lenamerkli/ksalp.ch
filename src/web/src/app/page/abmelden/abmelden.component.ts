@@ -25,7 +25,7 @@ export class AbmeldenComponent implements OnInit {
     this.httpClient.post<DefaultResponseDto>('/api/v1/account/logout', JSON.stringify({})).subscribe({
       next: response => {
         if (response.status && response.status === 'success') {
-          this.accountService.getAccountInfo().next(new Account({valid: false, info: null}));
+          this.accountService.getAccountInfo().next(new Account({valid: false, paid: false, info: null}));
           this.router.navigate(['/']).then();
         } else {
           alert(response.message);

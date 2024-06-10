@@ -24,5 +24,41 @@
         </li>
       </ul>
     </div>
+  } @else if (account !== null && account.isValid()) {
+    <div class="signin">
+      <h2>Willkommen zurück, {{account.getName()}}!</h2>
+      <div class="search">
+        <input class="search__input" type="text" size="48" name="search" autocomplete="off" value="" autofocus placeholder="Im Internet mit {{account.getSearch()}} suchen" id="search">
+        <button type="submit" id="submit">
+          <mat-icon id="search-icon">search</mat-icon>
+        </button>
+      </div>
+      <br>
+      <br>
+      <div class="ul-container">
+        <ul>
+          <li>
+            <a mat-raised-button color="primary" routerLink="/blog">Blog</a>
+          </li>
+          <li>
+            <a mat-raised-button color="primary" routerLink="/einstellungen">Einstellungen</a>
+          </li>
+          <li>
+            <a mat-raised-button color="primary" routerLink="/abmelden">Abmelden</a>
+          </li>
+        </ul>
+      </div>
+      <br>
+      <div class="cards">
+        @for (favorite of account.getFavorites(); track $index){
+          <mat-card (click)="window.open(favorite.split('|')[0], '_self')">
+            <img mat-card-lg-image src="/api/v1/favicon/{{favorite.split('|')[0]}}">
+            <mat-card-content>
+              <p>{{favorite.split('|')[1]}}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
   }
 </div>

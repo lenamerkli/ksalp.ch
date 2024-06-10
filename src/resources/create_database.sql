@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     banned TEXT NOT NULL,
     search TEXT NOT NULL,
     class TEXT NOT NULL,
-    grade TEXT NOT NULL
+    grade TEXT NOT NULL,
+    favorites TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS comments (
     id TEXT PRIMARY KEY,

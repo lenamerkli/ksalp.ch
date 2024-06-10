@@ -260,7 +260,8 @@ class User:
 
     def __init__(self, id_: str = None, name: str = '', mail: str = '', salt: bytes = b'', hash_: bytes = b'',
                  newsletter: int = 0, created: datetime = None, theme: str = 'light', iframe: int = 0, payment: datetime = None,
-                 banned: list = None, search: str = 'Startpage', classes: list = None, grade: str = '-') -> None:
+                 banned: list = None, search: str = 'Startpage', classes: list = None, grade: str = '-',
+                 favorites: list = None) -> None:
         self._id = ''
         self._name = ''
         self._mail = ''
@@ -275,6 +276,7 @@ class User:
         self._search = 'Startpage'
         self._classes = ''
         self._grade = ''
+        self._favorites = ''
         if id_ is None:
             id_ = rand_base64(8)
         if created is None:
@@ -285,6 +287,16 @@ class User:
             banned = []
         if classes is None:
             classes = ['-']
+        if favorites is None:
+            favorites = [
+                'https://schulnetz.lu.ch/ksalp | Schulnetz',
+                'https://outlook.office.com/mail/ | @sluz Mail',
+                'https://microsoft365.com/ | Microsoft 365',
+                'https://ksalpenquai.lu.ch/ | Kantonsschule Alpenquai Luzern',
+                'https://ksalpenquai.lu.ch/service/so | Schüler*innenorganisation',
+                'https://duden.de/ | Duden',
+                'https://deepl.com/translator | DeepL Übersetzer',
+            ]
         self.id_ = id_
         self.name = name
         self.mail = mail
@@ -299,6 +311,7 @@ class User:
         self.search = search
         self.classes = classes
         self.grade = grade
+        self.favorites = favorites
 
     def __str__(self) -> str:
         return f"User #{self._id}"
@@ -319,6 +332,7 @@ class User:
             'search': self.search,
             'classes': self.classes,
             'grade': self.grade,
+            'favorites': self.favorites,
         }
 
     @property
@@ -338,6 +352,7 @@ class User:
             'search': self.search,
             'classes': self.classes,
             'grade': self.grade,
+            'favorites': self.favorites,
         }
 
     def save(self) -> None:
@@ -348,7 +363,7 @@ class User:
         if self._id is None:
             raise ValueError('No user id')
         if not query_db('SELECT id FROM users WHERE id=?', (self._id,), True):
-            query_db('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
+            query_db('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
                 self._id,
                 self._name,
                 self._mail,
@@ -363,10 +378,11 @@ class User:
                 self._search,
                 self._classes,
                 self._grade,
+                self._favorites,
             ))
         else:
             query_db('UPDATE users SET name=?, mail=?, salt=?, hash=?, newsletter=?, created=?, theme=?, iframe=?, payment=?, '
-                     'banned=?, search=?, class=?, grade=? WHERE id=?', (
+                     'banned=?, search=?, class=?, grade=?, favorites=? WHERE id=?', (
                          self._name,
                          self._mail,
                          self._salt,
@@ -380,6 +396,7 @@ class User:
                          self._search,
                          self._classes,
                          self._grade,
+                         self._favorites,
                          self._id
                      ))
 
@@ -406,6 +423,7 @@ class User:
         user._search = result[11]
         user._classes = result[12]
         user._grade = result[13]
+        user._favorites = result[14]
         return user
 
     @staticmethod
@@ -431,6 +449,7 @@ class User:
         user._search = result[11]
         user._classes = result[12]
         user._grade = result[13]
+        user._favorites = result[14]
         return user
 
     @property
@@ -553,6 +572,14 @@ class User:
         if v not in GRADES:
             raise ValueError(f"{v} is not a valid grade")
         self._grade = v
+
+    @property
+    def favorites(self) -> list:
+        return self._favorites.split('\n')
+
+    @favorites.setter
+    def favorites(self, v: list) -> None:
+        self._favorites = '\n'.join(v)
 
     def is_banned(self, checks: list) -> bool:
         """
@@ -1595,6 +1622,9 @@ class Login:
     def browser(self, v: str) -> None:
         self._browser = v
 
+    def get_account(self):
+        return User.load(self._account)
+
 
 def login_required(func):
     def wrapper(*args, **kwargs):
@@ -1607,6 +1637,7 @@ def login_required(func):
             if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
                 return func(*args, **kwargs)
         return r
+    wrapper.__name__ = func.__name__
     return wrapper
 
 
@@ -1630,14 +1661,15 @@ def route_static(file):
 
 @app.route('/api/v1/account', methods=['GET'])
 def r_api_v1_account():
-    r = {'valid': False, 'info': {}}
+    r = {'valid': False, 'paid': False, 'info': {}}
     try:
         login = Login.load(session['account'])
         if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
             user = User.load(login.account)
-            r = {'valid': True, 'info': user.json}
+            paid = user.valid_payment()
+            r = {'valid': True, 'paid': paid, 'info': user.json}
     except Exception:
-        r = {'valid': False, 'info': {}}
+        r = {'valid': False, 'paid': False, 'info': {}}
     return r
 
 

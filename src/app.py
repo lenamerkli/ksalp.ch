@@ -293,9 +293,13 @@ class User:
                 'https://outlook.office.com/mail/ | @sluz Mail',
                 'https://microsoft365.com/ | Microsoft 365',
                 'https://ksalpenquai.lu.ch/ | Kantonsschule Alpenquai Luzern',
-                'https://ksalpenquai.lu.ch/service/so | Schüler*innenorganisation',
+                'https://ksalpenquai.lu.ch/service/so | Schüler*innen-organisation (SO)',
                 'https://duden.de/ | Duden',
+                'https://mentor.duden.de/ | Duden Mentor',
                 'https://deepl.com/translator | DeepL Übersetzer',
+                'https://www.wolframalpha.com/ | WolframAlpha Rechner',
+                'https://www.geo.lu.ch/map/basisplan | Karte Luzern',
+                'https://openstreetmap.org | Karte International',
             ]
         self.id_ = id_
         self.name = name

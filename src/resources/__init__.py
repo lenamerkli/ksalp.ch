@@ -1,5 +1,3 @@
-import string as _string
-
 EXTENSIONS = {
     'application/gzip': 'GZ',
     'application/json': 'JSON',
@@ -90,7 +88,7 @@ SEARCH_ENGINES = {
         'url': 'https://duckduckgo.com/?q=%s',
         'recommended': True,
     },
-    'BraveSearch': {
+    'Brave Search': {
         'url': 'https://search.brave.com/search?q=%s',
         'recommended': True,
     },
@@ -104,7 +102,7 @@ SEARCH_ENGINES = {
     },
     'SearXNG': {
         'url': 'https://search.gcomm.ch/search?q=%s&language=de-CH',
-        'recommended': True,
+        'recommended': False,
     },
     'WolframAlpha': {
         'url': 'https://www.wolframalpha.com/input?i=%s',
@@ -118,21 +116,21 @@ SEARCH_ENGINES = {
         'url': 'https://www.bing.com/search?q=%s',
         'recommended': False,
     },
-    'DuckDuckGo[Lite]': {
+    'DuckDuckGo [Lite]': {
         'url': 'https://lite.duckduckgo.com/lite/?q=%s',
-        'recommended': True,
+        'recommended': False,
     },
-    'DuckDuckGo[TOR]': {
+    'DuckDuckGo [TOR]': {
         'url': 'https://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion/?q=%s',
-        'recommended': True,
+        'recommended': False,
     },
-    'Brave Search[TOR]': {
+    'Brave Search [TOR]': {
         'url': 'https://search.brave4u7jddbv7cyviptqjc7jusxh72uik7zt6adtckl5f4nwy2v72qd.onion/search?q=%s',
-        'recommended': True,
+        'recommended': False,
     },
-    'SearXNG[TOR]': {
+    'SearXNG [TOR]': {
         'url': 'http://searx3aolosaf3urwnhpynlhuokqsgz47si4pzz5hvb7uuzyjncl2tid.onion/search?q=%s', # noqa
-        'recommended': True,
+        'recommended': False,
     },
 }
 SIZE_UNITS = [

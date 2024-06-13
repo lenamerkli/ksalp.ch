@@ -11,6 +11,10 @@ export class AccountService {
   private accountInfo: BehaviorSubject<Account | null> = new BehaviorSubject<Account | null>(null);
 
   constructor(private httpClient: HttpClient) {
+    this.update()
+  }
+
+  update(): void {
     this.httpClient.get<AccountDto>('/api/v1/account').subscribe((value: AccountDto) => {
       let account = new Account(value);
       this.accountInfo.next(account);

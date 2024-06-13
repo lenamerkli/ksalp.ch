@@ -1,0 +1,147 @@
+<div id="container">
+  @if (account !== null && account.isValid()){
+    <h2>Einstellungen</h2>
+    <p>Name: <i>{{account.getName()}}</i> ID: <i>#{{account.getId()}}</i></p>
+    <mat-divider></mat-divider>
+    <h3>Inhaltsverzeichnis</h3>
+    <ul>
+      <li><button mat-button (click)="scrollToElement(premium)">Premium</button></li>
+      <li><button mat-button (click)="scrollToElement(farbschema)">Farbschema</button></li>
+      <li><button mat-button (click)="scrollToElement(klassen)">Klassen</button></li>
+      <li><button mat-button (click)="scrollToElement(klassenstufe)">Klassenstufe</button></li>
+      <li><button mat-button (click)="scrollToElement(suchmaschine)">Suchmaschine</button></li>
+      <li><button mat-button (click)="scrollToElement(iframes)">iFrames</button></li>
+      <li><button mat-button (click)="scrollToElement(passwort)">Passwort</button></li>
+      <li><button mat-button (click)="scrollToElement(benachrichtigungen)">Benachrichtigungen</button></li>
+    </ul>
+    <mat-divider></mat-divider>
+    <h3 #premium>Premium</h3>
+    @if (account.isPaid()){
+      <p>Ihr Premium-Abo ist gültig bis {{account.paymentEnd().utcOffset('Europe/Zurich').format('DD.MM.YYYY')}}.</p>
+      <a mat-raised-button color="primary" routerLink="/premium">Verlängern</a>
+    } @else {
+      <p>Sie besitzen kein Premium-Abonnement.
+        Mit einem Premium-Abonnement erhalten Sie zusätzliche Funktionen, wie weitere Farbschemen, und Sie unterstützen ksalp.ch.
+        Das Betreiben einer Webseite ist nicht günstig; ausserdem werden hunderte Arbeitsstunden investiert.
+        Die Lite-Version dieses Abonnements kostet nur 4 Franken pro Jahr, die Vollversion 20 Franken, und ermöglicht diese Webseite erst.</p>
+      <a mat-raised-button color="primary" routerLink="/premium">Vorteile ansehen</a>
+    }
+    <mat-divider></mat-divider>
+    <h3 #farbschema>Farbschema</h3>
+    <p>Aktuell benutzen Sie das Farbschema <i>{{themes[account.getTheme()]}}</i>.</p>
+    @if (account.isPaid()){
+    } @else {
+      <p>Da Sie kein Premium-Abonnement besitzen, können Sie Ihr Farbschema nicht ändern.</p>
+    }
+    <mat-divider></mat-divider>
+    <h3 #klassen>Klassen</h3>
+    <p>Sie sind in der Klasse <i>{{account.getClasses()}}</i>.</p>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Klasse und Kursbezeichnungen</mat-label>
+      <input matInput placeholder="G19a SBC-5B" [formControl]="class_" (blur)="updateErrorMessageClass()" id="class_">
+      <mat-hint>Klassen mit einem Leerzeichen trennen.</mat-hint>
+      @if (class_.invalid) {
+        <mat-error>{{errorMessageClass}}</mat-error>
+      }
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="submitClass()">Speichern</button>
+    <p>
+      Kursbezeichnungen sind (klassenübergreifende) Gruppen von Schüler*innen.
+      Sie sind beim <a href="https://ksalpenquai.lu.ch/service/stundenplaene">Stundenplan</a> unten bei den Anmerkungen in der Zeile Text vermerkt.
+      Bitte geben Sie nur die ersten beiden Teile ein; so wird aus SBC-5D-hal,hmr nur SBC-5D.
+      Die Kursbezeichnungen ändern sich jedes Schuljahr.
+    </p>
+    <mat-divider></mat-divider>
+    <h3 #klassenstufe>Klassenstufe</h3>
+    <p>Sie sind in der Klassenstufe <i>{{account.getGrade()}}</i>.</p>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Klassenstufe</mat-label>
+      <mat-select placeholder="" [formControl]="grade" (blur)="updateErrorMessageGrade()" id="grade">
+        @for (grade of grades; track grade){
+          <mat-option [value]="grade">{{grade}}</mat-option>
+        }
+      </mat-select>
+      @if (grade.invalid) {
+        <mat-error>{{errorMessageGrade}}</mat-error>
+      }
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="submitGrade()">Speichern</button>
+    <p>Sport- und Musikklassen wählen ab der 3. Klasse die Klassenstufe eins unter der im Stundenplan eingetragenen Klassenstufe.</p>
+    <mat-divider></mat-divider>
+    <h3 #suchmaschine>Suchmaschine</h3>
+    <p>Sie benutzen die Suchmaschine <i>{{account.getSearch()}}</i>.</p>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Suchmaschine</mat-label>
+      <mat-select placeholder="" id="search" [formControl]="searchEngine">
+        @for (searchEngine of Object.keys(searchEngines); track searchEngine){
+          @if (searchEngines[searchEngine].recommended) {
+            <mat-option [value]="searchEngine"><mat-icon>recommend</mat-icon>{{searchEngine}}</mat-option>
+          } @else {
+            <mat-option [value]="searchEngine">{{searchEngine}}</mat-option>
+          }
+        }
+      </mat-select>
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="submitSearchEngine()">Speichern</button>
+    <p>Suchmaschinen mit dem Suffix <i>[TOR]</i> sind nur mit dem <a href="https://www.torproject.org/download/">Tor-Browser</a> verfügbar.</p>
+    <mat-divider></mat-divider>
+    <h3 #iframes>iFrames</h3>
+    @if (account.getIframe()){
+      <p>iFrames sind aktiviert.</p>
+      <button mat-raised-button color="primary" (click)="sendIframe(false)">Deaktivieren</button>
+    } @else {
+      <p>iFrames sind deaktiviert.</p>
+      <button mat-raised-button color="primary" (click)="sendIframe(true)">Aktivieren</button>
+    }
+    <p>Mit iFrames wird die Vorschau der Dokumente erstellt. Da einige Menschen keine iFrames nutzen möchten, lassen sie sich hier sowohl deaktivieren und auch aktivieren. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe">Mehr Informationen.</a></p>
+    <mat-divider></mat-divider>
+    <h3 #passwort>Passwort</h3>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Aktuelles Passwort</mat-label>
+      <input matInput placeholder="****************" type="password" id="oldPassword" [formControl]="oldPassword" (blur)="updateErrorMessageOldPassword()">
+      @if (oldPassword.invalid){
+        <mat-error>{{errorMessageOldPassword}}</mat-error>
+      }
+    </mat-form-field>
+    <br>
+    <br>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Neues Passwort</mat-label>
+      <input matInput placeholder="****************" type="password" id="password" [formControl]="password" (blur)="updateErrorMessagePassword()">
+      @if (password.invalid){
+        <mat-error>{{errorMessagePassword}}</mat-error>
+      }
+      <mat-hint #rating>Sicherheit: {{ratingMessage}}</mat-hint>
+    </mat-form-field>
+    <br>
+    <br>
+    <mat-form-field [style.width.em]="24">
+      <mat-label>Neues Passwort wiederholen</mat-label>
+      <input matInput placeholder="****************" type="password" id="passwordRepeat" [formControl]="passwordRepeat" (blur)="updateErrorMessagePasswordRepeat()">
+      @if (passwordRepeat.invalid){
+        <mat-error>{{errorMessagePasswordRepeat}}</mat-error>
+      }
+    </mat-form-field>
+    <br>
+    <br>
+    <button mat-raised-button color="primary" (click)="submitPassword()">Passwort ändern</button>
+    <mat-divider></mat-divider>
+    <h3 #benachrichtigungen>Benachrichtigungen</h3>
+    @if (account.getNewsletter()){
+      <p>Sie haben Benachrichtigungen per E-Mail aktiviert.</p>
+      <button mat-raised-button color="primary" (click)="sendNewsletter(false)">Deaktivieren</button>
+    } @else {
+      <p>Sie haben Benachrichtigungen per E-Mail deaktiviert.</p>
+      <button mat-raised-button color="primary" (click)="sendNewsletter(true)">Aktivieren</button>
+    }
+    <p>Falls Benachrichtigungen per E-Mail aktiviert sind, erhalten Sie Meldungen zu verdächtigen Aktivitäten auf Ihrem Konto und Informationen zu bevorstehenden Änderungen der Allgemeinen Geschäftsbedingungen und den Datenschutzbestimmungen.</p>
+    <mat-divider></mat-divider>
+    <p>Um Ihre E-Mail-Adresse oder Ihren Namen zu ändern, oder Ihr Konto zu löschen, <a routerLink="/über/kontakt">kontaktieren</a> Sie uns bitte.</p>
+  }
+  <br>
+  <br>
+  <br>
+</div>

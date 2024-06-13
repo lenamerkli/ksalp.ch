@@ -1,5 +1,9 @@
+import moment from "moment";
+
 export class Account{
+  private readonly id: string = '';
   private readonly name: string = '';
+  private readonly newsletter: boolean = false;
   private readonly theme: string = 'light';
   private readonly iframe: boolean = false;
   private readonly payment: string = '2000-01-01';
@@ -14,7 +18,9 @@ export class Account{
     this.valid = dto.valid;
     this.paid = dto.paid;
     if(dto.info !== null){
+      this.id = dto.info.id_;
       this.name = dto.info.name;
+      this.newsletter = dto.info.newsletter;
       this.theme = dto.info.theme;
       this.iframe = dto.info.iframe;
       this.payment = dto.info.payment;
@@ -25,8 +31,16 @@ export class Account{
     }
   }
 
+  public getId(): string{
+    return this.id;
+  }
+
   public getName(): string{
     return this.name;
+  }
+
+  public getNewsletter(): boolean{
+    return this.newsletter;
   }
 
   public getTheme(): string{
@@ -64,12 +78,18 @@ export class Account{
   public isPaid(): boolean{
     return this.paid;
   }
+
+  public paymentEnd(): moment.Moment{
+    return moment.utc(this.payment);
+  }
 }
 export interface AccountDto{
   valid: boolean;
   paid: boolean;
   info: {
+    id_: string,
     name: string,
+    newsletter: boolean,
     theme: string,
     iframe: boolean,
     payment: string,

@@ -606,7 +606,7 @@ class User:
         Check is the user has premium
         :return: boolean if the user has premium
         """
-        return (self.payment - datetime.now()).seconds > 0
+        return self.payment > datetime.now()
 
 
 class Comment:
@@ -1645,6 +1645,21 @@ def login_required(func):
     return wrapper
 
 
+def premium_required(func):
+    def wrapper(*args, **kwargs):
+        r = {'error': 'premium required'}, 401
+        if 'account' in session:
+            try:
+                user: User = Login.load(session['account']).get_account()
+            except Exception:
+                return r
+            if user.valid_payment():
+                return func(*args, **kwargs)
+        return r
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
 ########################################################################################################################
 # ROUTES
 ########################################################################################################################
@@ -1866,6 +1881,219 @@ def r_api_v1_account_logout():
     return {
         'status': 'success',
         'message': 'Account logged out successfully.'
+    }, 200
+
+
+@app.route('/api/v1/constants', methods=['GET'])
+def r_api_v1_constants():
+    return {
+        'extensions': EXTENSIONS,
+        'extensionsReverse': EXTENSIONS_REVERSE,
+        'fileTypes': FILE_TYPES,
+        'grades': GRADES,
+        'languages': LANGUAGES,
+        'searchEngines': SEARCH_ENGINES,
+        'sizeUnits': SIZE_UNITS,
+        'subjects': SUBJECTS,
+        'themes': THEMES,
+    }, 200
+
+
+@app.route('/api/v1/account/settings/theme', methods=['POST'])
+@login_required
+@premium_required
+def r_api_v1_account_settings_theme():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'theme',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `theme`',
+        }, 415
+    if data['theme'] not in THEMES:
+        return {
+            'error': 'invalid theme',
+            'message': 'The theme could not be found.',
+        }, 400
+    account = Login.load(session['account']).get_account()
+    account.theme = data['theme']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Theme updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/class_', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_class_():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'class_',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `class_`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    account.class_ = data['class_']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Class updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/grade', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_grade():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'grade',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `grade`',
+        }, 415
+    if data['grade'] not in GRADES:
+        return {
+            'error': 'invalid grade',
+            'message': 'The grade could not be found.',
+        }, 400
+    account = Login.load(session['account']).get_account()
+    account.grade = data['grade']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Grade updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/search', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_search():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'search',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `search`',
+        }, 415
+    if data['search'] not in SEARCH_ENGINES:
+        return {
+            'error': 'invalid search engine',
+            'message': 'The search engine could not be found.',
+        }, 400
+    account = Login.load(session['account']).get_account()
+    account.search = data['search']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Search engine updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/iframe', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_iframe():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'iframe',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `iframe`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    account.iframe = data['iframe']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Iframe settings updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/password', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_password():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'oldPassword',
+        'password',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `oldPassword`, `password`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    if not account.check_password(data['oldPassword']):
+        return {
+            'error': 'invalid password',
+            'message': 'The old password is invalid.',
+        }, 400
+    account.salt = rand_salt()
+    account.hash_ = hash_password(data['password'], account.salt)
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Password updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/account/settings/newsletter', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_newsletter():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'newsletter',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `newsletter`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    account.newsletter = data['newsletter']
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Newsletter settings updated successfully.',
     }, 200
 
 

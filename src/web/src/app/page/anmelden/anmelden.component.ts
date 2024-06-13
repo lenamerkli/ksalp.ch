@@ -68,10 +68,7 @@ export class AnmeldenComponent {
       })).subscribe({
           next: response => {
             if (response.status && response.status === 'success') {
-              this.httpClient.get<AccountDto>('/api/v1/account').subscribe((value: AccountDto) => {
-                let account = new Account(value);
-                this.accountService.getAccountInfo().next(account);
-              });
+              this.accountService.update();
               this.router.navigate(['/']).then();
             } else {
               alert(response.message);

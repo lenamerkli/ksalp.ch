@@ -31,6 +31,16 @@
     <h3 #farbschema>Farbschema</h3>
     <p>Aktuell benutzen Sie das Farbschema <i>{{themes[account.getTheme()]}}</i>.</p>
     @if (account.isPaid()){
+      <mat-form-field [style.width.em]="24">
+        <mat-label>Farbschema</mat-label>
+        <mat-select [formControl]="theme">
+          @for (theme of Object.keys(themes); track theme){
+            <mat-option [value]="theme">{{themes[theme]}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <br>
+      <button mat-raised-button color="primary" (click)="submitTheme()">Speichern</button>
     } @else {
       <p>Da Sie kein Premium-Abonnement besitzen, können Sie Ihr Farbschema nicht ändern.</p>
     }

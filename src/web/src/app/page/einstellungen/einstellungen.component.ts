@@ -79,6 +79,9 @@ export class EinstellungenComponent implements OnInit{
     Validators.minLength(8),
     this.createPasswordRepeatValidator(),
   ]);
+  theme = new FormControl('', [
+    Validators.required,
+  ])
   searchEngine = new FormControl('', [
     Validators.required,
   ]);
@@ -96,7 +99,7 @@ export class EinstellungenComponent implements OnInit{
   ratingMessage = 'sehr schlecht';
 
   public account: Account | null = null;
-  public themes: {[key: string]: string} = {};
+  public themes: {[key: string]: string} = {'light': 'Hell'};
   public grades: string[] = [];
   public searchEngines: {[key: string]: {url: string; recommended: boolean}} = {};
 
@@ -145,6 +148,7 @@ export class EinstellungenComponent implements OnInit{
 
   setDefaults(): void {
     if(this.account !== null) {
+      this.theme.setValue(this.account.getTheme());
       this.class_.setValue(this.account.getClasses().join(' '));
       this.grade.setValue(this.account.getGrade());
       this.searchEngine.setValue(this.account.getSearch());
@@ -451,6 +455,31 @@ export class EinstellungenComponent implements OnInit{
         error: error => {
           console.log(error);
           if (error.message){
+            alert(error.message);
+          } else {
+            alert(error);
+          }
+        }
+      });
+    }
+  }
+
+  submitTheme(): void {
+    if (!this.theme.invalid){
+      this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/theme',
+        JSON.stringify({theme: this.theme.value})
+      ).subscribe({
+        next: response => {
+          if (response.status && response.status === 'success') {
+            this.accountService.update();
+            alert('Ihr Farbschema wurde aktualisiert.');
+          } else {
+            alert(response.message);
+          }
+        },
+        error: error => {
+          console.log(error);
+          if (error.message) {
             alert(error.message);
           } else {
             alert(error);

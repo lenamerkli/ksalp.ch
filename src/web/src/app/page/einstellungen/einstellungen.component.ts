@@ -82,12 +82,16 @@ export class EinstellungenComponent implements OnInit{
   searchEngine = new FormControl('', [
     Validators.required,
   ]);
+  favoriteWebsites = new FormControl('', [
+    Validators.pattern(/^(?:https?:\/\/|www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s|]*)?\s*\|\s*[^\r\n]*(?:\r?\n(?:https?:\/\/|www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s|]*)?\s*\|\s*[^\r\n]*)*$/),
+  ])
 
   errorMessageClass = '';
   errorMessageGrade = '';
   errorMessageOldPassword = '';
   errorMessagePassword = '';
   errorMessagePasswordRepeat = '';
+  errorMessageFavoriteWebsites = '';
 
   ratingMessage = 'sehr schlecht';
 
@@ -106,7 +110,6 @@ export class EinstellungenComponent implements OnInit{
       this.account = value;
       this.setDefaults();
     });
-    console.log(this.constantService.getGrades());
     this.constantService.getThemes().subscribe((value: {[key: string]: string}) => {
       this.themes = value;
     });
@@ -131,6 +134,9 @@ export class EinstellungenComponent implements OnInit{
     merge(this.passwordRepeat.statusChanges, this.passwordRepeat.valueChanges)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateErrorMessagePasswordRepeat());
+    merge(this.favoriteWebsites.statusChanges, this.favoriteWebsites.valueChanges)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.updateErrorMessageFavoriteWebsites());
   }
 
   ngOnInit() {
@@ -142,6 +148,7 @@ export class EinstellungenComponent implements OnInit{
       this.class_.setValue(this.account.getClasses().join(' '));
       this.grade.setValue(this.account.getGrade());
       this.searchEngine.setValue(this.account.getSearch());
+      this.favoriteWebsites.setValue(this.account.getFavorites().join('\n'));
     }
   }
 
@@ -211,6 +218,14 @@ export class EinstellungenComponent implements OnInit{
       this.errorMessagePasswordRepeat = 'Die neuen Passwärter unterscheiden sich.';
     } else {
       this.errorMessagePasswordRepeat = '';
+    }
+  }
+
+  updateErrorMessageFavoriteWebsites() {
+    if (this.favoriteWebsites.hasError('pattern')) {
+      this.errorMessageFavoriteWebsites = 'Die Favoriten müssen wie im Platzhalter formatiert eingeben werden.';
+    } else {
+      this.errorMessageFavoriteWebsites = '';
     }
   }
 
@@ -417,6 +432,31 @@ export class EinstellungenComponent implements OnInit{
       this.passwordRepeat.markAsTouched();
       this.updateErrorMessagePasswordRepeat();
       this.updateRating();
+    }
+  }
+
+  submitFavoriteWebsites(): void {
+    if (!this.favoriteWebsites.invalid){
+      this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/favorites',
+        JSON.stringify({favorites: this.favoriteWebsites.value})
+      ).subscribe({
+        next: response => {
+          if (response.status && response.status === 'success') {
+            this.accountService.update();
+            alert('Ihre Favoriten wurden aktualisiert.');
+          } else {
+            alert(response.message);
+          }
+        },
+        error: error => {
+          console.log(error);
+          if (error.message){
+            alert(error.message);
+          } else {
+            alert(error);
+          }
+        }
+      });
     }
   }
 

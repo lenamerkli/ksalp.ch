@@ -2097,6 +2097,31 @@ def r_api_v1_account_settings_newsletter():
     }, 200
 
 
+@app.route('/api/v1/account/settings/favorites', methods=['POST'])
+@login_required
+def r_api_v1_account_settings_favorites():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'favorites',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `favorites`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    account.favorites = [i.strip() for i in data['favorites'].split('\n') if ' | ' in i.strip()]
+    account.save()
+    return {
+        'status': 'success',
+        'message': 'Favorites settings updated successfully.',
+    }, 200
+
+
 @app.errorhandler(404)
 def error_handler_404(*_, **__):
     res = requests_send(

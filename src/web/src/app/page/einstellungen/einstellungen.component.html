@@ -11,6 +11,7 @@
       <li><button mat-button (click)="scrollToElement(klassenstufe)">Klassenstufe</button></li>
       <li><button mat-button (click)="scrollToElement(suchmaschine)">Suchmaschine</button></li>
       <li><button mat-button (click)="scrollToElement(iframes)">iFrames</button></li>
+      <li><button mat-button (click)="scrollToElement(favoriten)">Favoriten Webseiten</button></li>
       <li><button mat-button (click)="scrollToElement(passwort)">Passwort</button></li>
       <li><button mat-button (click)="scrollToElement(benachrichtigungen)">Benachrichtigungen</button></li>
     </ul>
@@ -97,6 +98,18 @@
       <button mat-raised-button color="primary" (click)="sendIframe(true)">Aktivieren</button>
     }
     <p>Mit iFrames wird die Vorschau der Dokumente erstellt. Da einige Menschen keine iFrames nutzen möchten, lassen sie sich hier sowohl deaktivieren und auch aktivieren. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe">Mehr Informationen.</a></p>
+    <mat-divider></mat-divider>
+    <h3 #favoriten>Favoriten Webseiten</h3>
+    <mat-form-field [style.width.em]="48">
+      <mat-label>Favoriten Webseiten</mat-label>
+      <textarea rows="8" matInput id="favoriteWebsites" [formControl]="favoriteWebsites" (blur)="updateErrorMessageFavoriteWebsites()"></textarea>
+      @if (favoriteWebsites.invalid) {
+        <mat-error>{{errorMessageFavoriteWebsites}}</mat-error>
+      }
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="submitFavoriteWebsites()">Speichern</button>
+    <p>Ihre Favoriten werden auf der Hauptseite angezeigt.</p>
     <mat-divider></mat-divider>
     <h3 #passwort>Passwort</h3>
     <mat-form-field [style.width.em]="24">

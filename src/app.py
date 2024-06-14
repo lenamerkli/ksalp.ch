@@ -1947,7 +1947,7 @@ def r_api_v1_account_settings_class_():
             'message': 'At least one of the following required fields is missing: `class_`',
         }, 415
     account = Login.load(session['account']).get_account()
-    account.class_ = data['class_']
+    account.classes = data['class_'].split(' ')
     account.save()
     return {
         'status': 'success',

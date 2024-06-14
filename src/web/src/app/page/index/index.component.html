@@ -28,8 +28,8 @@
     <div class="signin">
       <h2>Willkommen zurück, {{account.getName()}}!</h2>
       <div class="search">
-        <input class="search__input" type="text" size="48" name="search" autocomplete="off" value="" autofocus placeholder="Im Internet mit {{account.getSearch()}} suchen" id="search">
-        <button type="submit" id="submit">
+        <input class="search__input" type="text" size="48" (keyup.enter)="submitSearch()" name="search" autocomplete="off" value="" autofocus placeholder="Im Internet mit {{account.getSearch()}} suchen" id="search">
+        <button type="submit" id="submit" (click)="submitSearch()">
           <mat-icon id="search-icon">search</mat-icon>
         </button>
       </div>

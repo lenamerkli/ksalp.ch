@@ -20,4 +20,10 @@ export interface ConstantDto {
   themes: {
     [key: string]: string
   };
+  imprint: {
+    'name': string,
+    'address': string,
+    'city': string,
+    'mail': string,
+  };
 }

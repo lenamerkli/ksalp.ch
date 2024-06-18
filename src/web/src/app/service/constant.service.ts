@@ -19,6 +19,17 @@ export class ConstantService {
   private themes: BehaviorSubject<{[key: string]: string}> = new BehaviorSubject<{[key: string]: string}>({
     light: 'Hell',
   });
+  private imprint: BehaviorSubject<{
+    name: string,
+    address: string,
+    city: string,
+    mail: string,
+  }> = new BehaviorSubject<{name: string, address: string, city: string, mail: string}>({
+    name: 'lädt...',
+    address: 'lädt...',
+    city: 'lädt...',
+    mail: 'lädt...',
+  })
 
   constructor(
     private httpClient: HttpClient,
@@ -33,6 +44,7 @@ export class ConstantService {
       this.sizeUnits.next(value.sizeUnits);
       this.subjects.next(value.subjects);
       this.themes.next(value.themes);
+      this.imprint.next(value.imprint);
     });
   }
 
@@ -70,5 +82,14 @@ export class ConstantService {
 
   getThemes(): BehaviorSubject<{ [p: string]: string }> {
     return this.themes;
+  }
+
+  getImprint(): BehaviorSubject<{
+    name: string,
+    address: string,
+    city: string,
+    mail: string,
+  }> {
+    return this.imprint;
   }
 }

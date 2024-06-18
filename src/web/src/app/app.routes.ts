@@ -8,6 +8,7 @@ import {FertigComponent} from "./page/registrieren/fertig/fertig.component";
 import {AbmeldenComponent} from "./page/abmelden/abmelden.component";
 import {_404Component} from "./page/error/404/404.component";
 import {EinstellungenComponent} from "./page/einstellungen/einstellungen.component";
+import {DatenschutzComponent} from "./page/ueber/datenschutz/datenschutz.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -18,5 +19,6 @@ export const routes: Routes = [
   {path: 'registrieren/weiter', component: WeiterComponent},
   {path: 'registrieren/fertig', component: FertigComponent},
   {path: 'registrieren/mail/:mail_code', component: MailComponent},
+  {path: 'über/datenschutz', component: DatenschutzComponent},
   {path: '**', component: _404Component},
 ];

@@ -1896,6 +1896,12 @@ def r_api_v1_constants():
         'sizeUnits': SIZE_UNITS,
         'subjects': SUBJECTS,
         'themes': THEMES,
+        'imprint': {
+            'name': environ.get('IMPRINT_NAME', 'Ein Fehler ist aufgetreten.'),
+            'address': environ.get('IMPRINT_ADDRESS', 'Ein Fehler ist aufgetreten.'),
+            'city': environ.get('IMPRINT_CITY', 'Ein Fehler ist aufgetreten.'),
+            'mail': environ.get('IMPRINT_MAIL', 'Ein Fehler ist aufgetreten.'),
+        },
     }, 200
 
 

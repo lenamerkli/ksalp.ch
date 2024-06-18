@@ -42,6 +42,15 @@ body{
   -moz-font-feature-settings: 'liga';
   -moz-osx-font-smoothing: grayscale;
 }
+.contents-list{
+  list-style: none;
+  display: inline-flex;
+  flex-wrap: wrap;
+  button{
+    border: #3f51b5 0.15em solid;
+    margin: 0.4em;
+  }
+}
 #container{
   max-width: fit-content;
   margin-left: auto;

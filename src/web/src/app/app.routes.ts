@@ -9,6 +9,7 @@ import {AbmeldenComponent} from "./page/abmelden/abmelden.component";
 import {_404Component} from "./page/error/404/404.component";
 import {EinstellungenComponent} from "./page/einstellungen/einstellungen.component";
 import {DatenschutzComponent} from "./page/ueber/datenschutz/datenschutz.component";
+import {AgbComponent} from "./page/ueber/agb/agb.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -20,5 +21,6 @@ export const routes: Routes = [
   {path: 'registrieren/fertig', component: FertigComponent},
   {path: 'registrieren/mail/:mail_code', component: MailComponent},
   {path: 'über/datenschutz', component: DatenschutzComponent},
+  {path: 'über/agb', component: AgbComponent},
   {path: '**', component: _404Component},
 ];

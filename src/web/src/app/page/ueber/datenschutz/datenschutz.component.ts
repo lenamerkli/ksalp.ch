@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {ConstantService} from "../../../service/constant.service";
 import {RouterLink} from "@angular/router";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-datenschutz',
@@ -9,6 +10,7 @@ import {RouterLink} from "@angular/router";
   imports: [
     MatButton,
     RouterLink,
+    MatDivider,
   ],
   templateUrl: './datenschutz.component.html',
   styleUrl: './datenschutz.component.scss'

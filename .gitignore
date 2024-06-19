@@ -16,6 +16,7 @@ key.bin
 
 # not usable on other computers
 venv/
+.venv/
 .idea/
 __pycache__/
 *.pyc

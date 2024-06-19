@@ -3,3 +3,13 @@
   text-align-last: center;
   max-width: 72em;
 }
+ul{
+  padding-left: 20vw;
+  & p {
+    text-align: left;
+    text-align-last: left;
+  }
+  &.contents-list {
+    padding-left: 0;
+  }
+}

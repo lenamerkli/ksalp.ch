@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import {MatButton} from "@angular/material/button";
 import {ConstantService} from "../../../service/constant.service";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-datenschutz',
   standalone: true,
   imports: [
     MatButton,
+    RouterLink,
   ],
   templateUrl: './datenschutz.component.html',
   styleUrl: './datenschutz.component.scss'

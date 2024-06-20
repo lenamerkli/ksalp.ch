@@ -11,6 +11,7 @@ import {EinstellungenComponent} from "./page/einstellungen/einstellungen.compone
 import {DatenschutzComponent} from "./page/ueber/datenschutz/datenschutz.component";
 import {AgbComponent} from "./page/ueber/agb/agb.component";
 import {ImpressumComponent} from "./page/ueber/impressum/impressum.component";
+import {QuellcodeComponent} from "./page/ueber/quellcode/quellcode.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -21,6 +22,7 @@ export const routes: Routes = [
   {path: 'registrieren/weiter', component: WeiterComponent},
   {path: 'registrieren/fertig', component: FertigComponent},
   {path: 'registrieren/mail/:mail_code', component: MailComponent},
+  {path: 'über/quellcode', component: QuellcodeComponent},
   {path: 'über/impressum', component: ImpressumComponent},
   {path: 'über/datenschutz', component: DatenschutzComponent},
   {path: 'über/agb', component: AgbComponent},

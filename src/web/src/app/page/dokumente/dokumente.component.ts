@@ -58,6 +58,7 @@ export class DokumenteComponent implements OnInit {
     this.httpClient.get<DocumentsDto>('/api/v1/documents/list').subscribe((value: DocumentsDto) => {
       for (let document of value.documents) {
         this.documents.push(new Document(document));
+        this.update();
       }
     })
   }

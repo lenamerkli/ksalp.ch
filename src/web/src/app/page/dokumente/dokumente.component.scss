@@ -3,3 +3,12 @@
     margin: -0.5em 0.5em;
   }
 }
+mat-card{
+  cursor: pointer;
+  background-color: #f2f2f2;
+  margin: 0.5em;
+  padding: 0.5em;
+  text-align: left;
+  text-align-last: left;
+  max-width: 32em;
+}

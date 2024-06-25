@@ -2159,7 +2159,7 @@ def r_api_v1_documents_list():
         document = Document.load(i[0]).__dict__()
         document['created'] = document['created'].strftime(DATE_FORMAT)
         document['edited'] = document['edited'].strftime(DATE_FORMAT)
-        documents.append(Document.load(i[0]).__dict__())
+        documents.append(document)
     return {
         'status': 'success',
         'message': 'Documents retrieved successfully.',

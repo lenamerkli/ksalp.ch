@@ -56,10 +56,10 @@
   <br>
   @for (document of documents; track document) {
     @if (displayDocuments.includes(document.getId())) {
-      <mat-card appearance="raised" routerLink="/dokument/vorschau/{{document.getId()}}">
+      <mat-card appearance="raised" routerLink="/dokumente/vorschau/{{document.getId()}}">
         <mat-card-header>
           <mat-card-title>[{{document.getSubject().toUpperCase()}}] {{document.getTitle()}}</mat-card-title>
-          <mat-card-subtitle>{{document.getExtension().toUpperCase()}} - {{document.getEdited().split('_')[0]}}</mat-card-subtitle>
+          <mat-card-subtitle>[{{document.getExtension().toUpperCase()}} - {{document.getFormatedSize()}}] {{document.getCreated().split('_')[0]}} bis {{document.getEdited().split('_')[0]}}</mat-card-subtitle>
         </mat-card-header>
       </mat-card>
     }

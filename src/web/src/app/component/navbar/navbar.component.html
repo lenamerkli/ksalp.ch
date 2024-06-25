@@ -19,29 +19,9 @@
   <mat-accordion [multi]="false" class="mat-accordion">
     <app-navbar-link link="/">Hauptseite</app-navbar-link>
     <mat-divider></mat-divider>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Dokumente
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <mat-accordion [multi]="false">
-        <app-navbar-link link="/dokumente">Alle</app-navbar-link>
-        <app-navbar-link *ngFor="let element of account?.getClasses()" link="/dokumente?zeige={{element}}">{{element}}</app-navbar-link>
-      </mat-accordion>
-    </mat-expansion-panel>
+    <app-navbar-link link="/dokumente">Dokumente</app-navbar-link>
     <mat-divider></mat-divider>
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Lernsets
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <mat-accordion [multi]="false">
-        <app-navbar-link link="/lernsets">Alle</app-navbar-link>
-        <app-navbar-link *ngFor="let element of account?.getClasses()" link="/lernsets?zeige={{element}}">{{element}}</app-navbar-link>
-      </mat-accordion>
-    </mat-expansion-panel>
+    <app-navbar-link link="/lernsets">Lernsets</app-navbar-link>
     <mat-divider></mat-divider>
     <app-navbar-link link="/blog">Blog</app-navbar-link>
     <br class="navbar-whitespace">

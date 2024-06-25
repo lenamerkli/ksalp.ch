@@ -12,9 +12,11 @@ import {DatenschutzComponent} from "./page/ueber/datenschutz/datenschutz.compone
 import {AgbComponent} from "./page/ueber/agb/agb.component";
 import {ImpressumComponent} from "./page/ueber/impressum/impressum.component";
 import {QuellcodeComponent} from "./page/ueber/quellcode/quellcode.component";
+import {DokumenteComponent} from "./page/dokumente/dokumente.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
+  {path: 'dokumente', component: DokumenteComponent},
   {path: 'anmelden', component: AnmeldenComponent},
   {path: 'abmelden', component: AbmeldenComponent},
   {path: 'einstellungen', component: EinstellungenComponent},

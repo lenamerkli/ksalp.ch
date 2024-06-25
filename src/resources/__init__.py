@@ -1,3 +1,4 @@
+DATE_FORMAT = '%Y-%m-%d_%H-%M-%S'
 EXTENSIONS = {
     'application/gzip': 'GZ',
     'application/json': 'JSON',

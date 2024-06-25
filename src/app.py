@@ -76,7 +76,7 @@ def setup_logger(name, file):
     logger.addHandler(stream_handler)
 
 
-log_basicConfig(filename='main.log', format='%(asctime)s\t%(message)s', datefmt='%Y-%m-%d_%H-%M-%S', level=LOG_INFO)
+log_basicConfig(filename='main.log', format='%(asctime)s\t%(message)s', datefmt=DATE_FORMAT, level=LOG_INFO)
 
 setup_logger('access', join(app.root_path, 'logs', 'access.log'))
 access_log = GetLogger('access')
@@ -772,6 +772,8 @@ class Document:
             'extension': self.extension,
             'mimetype': self.mimetype,
             'size': self.size,
+            'formated_size': self.format_size(use_1024=True),
+            'owner_name': query_db('SELECT name FROM users WHERE id=?', (self.owner,), True)[0]
         }
 
     def save(self) -> None:
@@ -2125,6 +2127,22 @@ def r_api_v1_account_settings_favorites():
     return {
         'status': 'success',
         'message': 'Favorites settings updated successfully.',
+    }, 200
+
+
+@app.route('/api/v1/documents/list', methods=['GET'])
+def r_api_v1_documents_list():
+    documents = []
+    result = query_db('SELECT id FROM documents')
+    for i in result:
+        document = Document.load(i[0]).__dict__()
+        document['created'] = document['created'].strftime(DATE_FORMAT)
+        document['edited'] = document['edited'].strftime(DATE_FORMAT)
+        documents.append(Document.load(i[0]).__dict__())
+    return {
+        'status': 'success',
+        'message': 'Documents retrieved successfully.',
+        'documents': documents,
     }, 200
 
 

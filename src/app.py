@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from flask import Flask, g, session, request, Response, send_from_directory
-from os.path import join, exists, dirname
+from os.path import join, exists, dirname, getsize
 from os import urandom, environ, listdir
 from datetime import timedelta, datetime
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
@@ -718,8 +718,8 @@ class Comment:
 
 class Document:
 
-    def __init__(self, id_: str = None, title: str = '', subject: str = '', description: str = '', class_: str = '',
-                 grade: str = '', language: str = '', owner: str = '', edited: datetime = None, created: datetime = None,
+    def __init__(self, id_: str = None, title: str = '', subject: str = '-', description: str = '', class_: str = '',
+                 grade: str = '-', language: str = '-', owner: str = '', edited: datetime = None, created: datetime = None,
                  extension: str = '', mimetype: str = '', size: int = 0) -> None:
         self._id = ''
         self._title = ''
@@ -826,7 +826,20 @@ class Document:
         result = query_db('SELECT * FROM documents WHERE id=?', (document_id,), True)
         if not result:
             raise KeyError(f"No document with the id #{document_id} has been found")
-        return Document(*result)
+        document = Document(id_=result[0])
+        document._title = result[1]
+        document._subject = result[2]
+        document._description = result[3]
+        document._class = result[4]
+        document._grade = result[5]
+        document._language = result[6]
+        document._owner = result[7]
+        document._edited = result[8]
+        document._created = result[9]
+        document._extension = result[10]
+        document._mimetype = result[11]
+        document._size = result[12]
+        return document
 
     @property
     def id_(self) -> str:
@@ -835,6 +848,14 @@ class Document:
     @id_.setter
     def id_(self, v: str) -> None:
         self._id = v
+
+    @property
+    def title(self) -> str:
+        return self._title
+
+    @title.setter
+    def title(self, v: str) -> None:
+        self._title = v
 
     @property
     def subject(self) -> str:
@@ -876,7 +897,7 @@ class Document:
 
     @language.setter
     def language(self, v: str) -> None:
-        if v not in LANGUAGES.keys():
+        if v not in LANGUAGES:
             raise ValueError(f"{v} is not a valid language")
         self._language = v
 
@@ -886,7 +907,7 @@ class Document:
 
     @owner.setter
     def owner(self, v: str) -> None:
-        if not query_db('SELECT id FROM users WHERE id=?', (v,), True):
+        if not query_db('SELECT id FROM users WHERE id=?', (v,), True) and v != '':
             raise ValueError(f"No user with id #{v} exists")
         self._owner = v
 
@@ -2143,6 +2164,57 @@ def r_api_v1_documents_list():
         'status': 'success',
         'message': 'Documents retrieved successfully.',
         'documents': documents,
+    }, 200
+
+
+@app.route('/api/v1/documents/new/form', methods=['POST'])
+@login_required
+def r_api_v1_documents_upload():
+    form = dict(request.form)
+    if 'file' not in request.files:
+        return {
+            'error': 'missing file',
+            'message': 'No file was uploaded.',
+        }, 415
+    file = request.files['file']
+    if not all(form.get(i, '') for i in [
+        'title',
+        'subject',
+        'description',
+        'class',
+        'grade',
+        'language',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `title`, `subject`, `class`, '
+                       '`grade`, `language`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    extension = file.filename.split('.')[-1]
+    document = Document(
+        id_=None,
+        title=form['title'],
+        subject=form['subject'],
+        description=form['description'],
+        class_=form['class'],
+        grade=form['grade'],
+        language=form['language'],
+        owner=account.id_,
+        created=datetime.now(),
+        edited=datetime.now(),
+        extension=extension,
+        mimetype=EXTENSIONS_REVERSE.get(extension, 'application/octet-stream'),
+        size=0,
+    )
+    file_path = join(app.root_path, 'files', document.id_ + '.' + extension)
+    file.save(file_path)
+    document.size = getsize(file_path)
+    document.save()
+    return {
+        'status': 'success',
+        'message': 'Document created successfully.',
+        'id': document.id_,
     }, 200
 
 

@@ -1,0 +1,82 @@
+<div id="container">
+  <h2>Dokument hochladen</h2>
+  <mat-divider></mat-divider>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Titel</mat-label>
+    <input matInput placeholder="Titel" [formControl]="title">
+    @if (title.invalid) {
+      <mat-error>{{errorMessageTitle}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Fach</mat-label>
+    <mat-select placeholder="" [formControl]="subject">
+      @for (subject of Object.keys(subjects); track subject){
+        <mat-option [value]="subject">[{{subject}}] {{subjects[subject]}}</mat-option>
+      }
+    </mat-select>
+    @if (subject.invalid) {
+      <mat-error>{{errorMessageSubject}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Beschreibung</mat-label>
+    <input matInput placeholder="Beschreibung" [formControl]="description">
+    @if (description.invalid) {
+      <mat-error>{{errorMessageDescription}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Klasse oder Kursbezeichnung</mat-label>
+    <input matInput placeholder="Klasse oder Kursbezeichnung" [formControl]="class_">
+    @if (class_.invalid) {
+      <mat-error>{{errorMessageClass}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Klassenstufe</mat-label>
+    <mat-select placeholder="" [formControl]="grade">
+      @for (grade of grades; track grade){
+        <mat-option [value]="grade">{{grade}}</mat-option>
+      }
+    </mat-select>
+    @if (grade.invalid) {
+      <mat-error>{{errorMessageGrade}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <mat-form-field [style.width.em]="24">
+    <mat-label>Sprache</mat-label>
+    <mat-select placeholder="" [formControl]="language">
+      @for (language of languages; track language){
+        <mat-option [value]="language">{{language}}</mat-option>
+      }
+    </mat-select>
+    @if (language.invalid) {
+      <mat-error>{{errorMessageLanguage}}</mat-error>
+    }
+  </mat-form-field>
+  <br>
+  <br>
+  <button type="button" mat-raised-button color="primary" (click)="fileInput.click()">Datei auswählen</button>
+  <input hidden="hidden" type="file" #fileInput (change)="updateFileName($event)">
+  <p>{{this.fileName}}</p>
+  <br>
+  <button mat-raised-button color="primary" (click)="submit()">Hochladen</button>
+  <br>
+  <br>
+  <mat-divider></mat-divider>
+  <br>
+  <br>
+  <br>
+</div>

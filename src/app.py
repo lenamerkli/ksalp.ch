@@ -2218,7 +2218,7 @@ def r_api_v1_documents_upload():
         created=datetime.now(),
         edited=datetime.now(),
         extension=extension,
-        mimetype=EXTENSIONS_REVERSE.get(extension, 'application/octet-stream'),
+        mimetype=EXTENSIONS_REVERSE.get(extension.upper(), 'application/octet-stream'),
         size=0,
     )
     file_path = join(app.root_path, 'files', document.id_ + '.' + extension)

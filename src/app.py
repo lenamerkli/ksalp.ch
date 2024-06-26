@@ -2232,6 +2232,64 @@ def r_api_v1_documents_upload():
     }, 200
 
 
+@app.route('/api/v1/documents/edit/form', methods=['POST'])
+@login_required
+def r_api_v1_documents_edit():
+    form = dict(request.form)
+    if 'file' not in request.files:
+        return {
+            'error': 'missing file',
+            'message': 'No file was uploaded.',
+        }, 415
+    file = request.files['file']
+    if not all(form.get(i, '') for i in [
+        'title',
+        'subject',
+        'description',
+        'class',
+        'grade',
+        'language',
+        'id',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `title`, `subject`, `class`, '
+                       '`grade`, `language`, `id`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    extension = file.filename.split('.')[-1]
+    try:
+        document = Document.load(form['id'])
+    except Exception:
+        return {
+            'error': 'document not found',
+            'message': 'The requested document could not be found.',
+        }
+    if document.owner != account.id_:
+        return {
+            'error': 'permission denied',
+            'message': 'You do not have permission to edit this document.',
+        }
+    document.title = form['title']
+    document.subject = form['subject']
+    document.description = form['description']
+    document.class_ = form['class']
+    document.grade = form['grade']
+    document.language = form['language']
+    document.owner = account.id_
+    document.edited = datetime.now()
+    document.extension = extension
+    document.mimetype = EXTENSIONS_REVERSE.get(extension.upper(), 'application/octet-stream')
+    file_path = join(app.root_path, 'files', document.id_ + '.' + extension)
+    file.save(file_path)
+    document.size = getsize(file_path)
+    document.save()
+    return {
+        'status': 'success',
+        'message': 'Document created successfully.',
+    }, 200
+
+
 @app.route('/api/v1/documents/data/<document_id>', methods=['GET'])
 def r_api_v1_documents_data(document_id):
     try:

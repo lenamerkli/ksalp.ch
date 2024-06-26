@@ -1,0 +1,29 @@
+<div id="container">
+  @if (document !== null) {
+    <h2>[{{document.getClass()}}] {{document.getTitle()}}</h2>
+    <mat-divider></mat-divider>
+    <br>
+    <p>
+      <b>{{document.getExtension().toUpperCase()}} {{document.getFormatedSize()}}</b> |
+      Zuletzt bearbeitet am <b>{{document.getEdited().split('_')[0]}}</b> |
+      Erstellt am <b>{{document.getCreated().split('_')[0]}}</b> |
+      Hochgeladen von <b><i>{{document.getOwnerName()}}</i></b> |
+      Klasse: <i>{{document.getClass()}}</i> |
+      Klassenstufe: {{document.getGrade()}} |
+      Sprache: {{document.getLanguage()}}
+    </p>
+    <br>
+    <mat-divider></mat-divider>
+    <p class="links">
+      <a mat-raised-button color="primary" [href]="documentUrl" target="_blank" download="{{getSaveFilename()}}">Herunterladen <i class="material-icons">file_download</i></a>
+      <a mat-raised-button color="primary" [href]="documentUrl" target="_blank">In neuem Tab öffnen <i class="material-icons">open_in_new</i></a>
+      @if (account !== null && account.isValid() && account.getId() === document.getOwner()) {
+        <a mat-raised-button color="primary" routerLink="/dokumente/bearbeiten/{{document.getId()}}">Bearbeiten <i class="material-icons">edit</i></a>
+      }
+    </p>
+    <mat-divider></mat-divider>
+    @if (account === null || !account.isValid() || (account.isValid() && account.getIframe())) {
+      <iframe [src]="documentUrlFrame"></iframe>
+    }
+  }
+</div>

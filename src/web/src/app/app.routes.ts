@@ -14,11 +14,13 @@ import {ImpressumComponent} from "./page/ueber/impressum/impressum.component";
 import {QuellcodeComponent} from "./page/ueber/quellcode/quellcode.component";
 import {DokumenteComponent} from "./page/dokumente/dokumente.component";
 import {NeuComponent} from "./page/dokumente/neu/neu.component";
+import {VorschauComponent} from "./page/dokumente/vorschau/vorschau.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
   {path: 'dokumente', component: DokumenteComponent},
   {path: 'dokumente/neu', component: NeuComponent},
+  {path: 'dokumente/vorschau/:id', component: VorschauComponent},
   {path: 'anmelden', component: AnmeldenComponent},
   {path: 'abmelden', component: AbmeldenComponent},
   {path: 'einstellungen', component: EinstellungenComponent},

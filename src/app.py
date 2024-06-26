@@ -8,7 +8,7 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
-from flask import Flask, g, session, request, Response, send_from_directory
+from flask import Flask, g, session, request, Response, send_from_directory, make_response
 from os.path import join, exists, dirname, getsize
 from os import urandom, environ, listdir
 from datetime import timedelta, datetime
@@ -966,9 +966,9 @@ class Document:
             x = self.size / pow(n, i)
             if (x < n) or (v == len(units) - 1):
                 if i == 0:
-                    return f"{self.size} Bytes"
+                    return f"{x} Bytes"
                 else:
-                    return f"{self.size:3.1f} {v}{'i' if use_1024 else ''}B"
+                    return f"{x:3.1f} {v}{'i' if use_1024 else ''}B"
 
     def get_owner(self) -> User:
         """
@@ -1701,6 +1701,20 @@ def route_static(file):
     return resp
 
 
+@app.route('/dateien/dokumente/<string:id_>/<string:name>', methods=['GET'])
+def r_dateien_dokumente(id_: str, name: str):
+    try:
+        result = Document.load(id_)
+    except Exception:
+        return 'Datei konnte nicht gefunden werden', 404
+    if not result:
+        return 'Datei konnte nicht gefunden werden', 404
+    resp = make_response(send_from_directory(join(app.root_path, 'files'), id_))
+    resp.headers['Content-Disposition'] = f"inline; filename={name}"
+    resp.mimetype = result.mimetype
+    return resp
+
+
 @app.route('/api/v1/account', methods=['GET'])
 def r_api_v1_account():
     r = {'valid': False, 'paid': False, 'info': {}}
@@ -2215,6 +2229,24 @@ def r_api_v1_documents_upload():
         'status': 'success',
         'message': 'Document created successfully.',
         'id': document.id_,
+    }, 200
+
+
+@app.route('/api/v1/documents/data/<document_id>', methods=['GET'])
+def r_api_v1_documents_data(document_id):
+    try:
+        document = Document.load(document_id).__dict__()
+    except Exception:
+        return {
+            'error': 'document not found',
+            'message': 'The requested document could not be found.',
+        }, 404
+    document['created'] = document['created'].strftime(DATE_FORMAT)
+    document['edited'] = document['edited'].strftime(DATE_FORMAT)
+    return {
+        'status': 'success',
+        'message': 'Document retrieved successfully.',
+        'document': document,
     }, 200
 
 

@@ -1,7 +1,8 @@
 blinker==1.8.2
-certifi==2024.6.2
+certifi==2024.7.4
 charset-normalizer==3.3.2
 click==8.1.7
+colorama==0.4.6
 Flask==3.0.3
 gunicorn==22.0.0
 idna==3.7
@@ -9,9 +10,9 @@ itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==2.1.5
 packaging==24.1
-pip==24.0
+pip==24.1.2
 requests==2.32.3
-setuptools==70.0.0
-urllib3==2.2.1
+setuptools==71.1.0
+urllib3==2.2.2
 Werkzeug==3.0.3
 wheel==0.43.0

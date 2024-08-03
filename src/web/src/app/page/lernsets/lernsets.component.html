@@ -1,0 +1,87 @@
+<div id="container">
+  <h2>Lernsets</h2>
+  <mat-divider></mat-divider>
+  @if (account !== null && account.isValid()){
+    <p><a mat-raised-button color="primary" routerLink="/lernsets/neu">Lernset hochladen</a></p>
+  } @else {
+    <p>Sie müssen angemeldet sein, um Lernsets hochladen zu können.</p>
+  }
+  <mat-divider></mat-divider>
+  <h3>Filter</h3>
+  <br>
+  <div id="inputs">
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Titel & Beschreibung</mat-label>
+      <input matInput type="text" [formControl]="text" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Klasse</mat-label>
+      <input matInput type="text" [formControl]="class_" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Klassenstufe</mat-label>
+      <input matInput type="text" [formControl]="grade" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Fach (Kürzel)</mat-label>
+      <input matInput type="text" [formControl]="subject" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Sprache (Kürzel)</mat-label>
+      <input matInput type="text" [formControl]="language_" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>Ersteller*in</mat-label>
+      <input matInput type="text" [formControl]="creator" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>später erstellt als</mat-label>
+      <input matInput type="text" [formControl]="createdAfter" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>früher erstellt als</mat-label>
+      <input matInput type="text" [formControl]="createdBefore" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>später bearbeitet als</mat-label>
+      <input matInput type="text" [formControl]="editedAfter" (keyup)="update()">
+    </mat-form-field>
+    <mat-form-field [style.width.em]="16">
+      <mat-label>früher bearbeitet als</mat-label>
+      <input matInput type="text" [formControl]="editedBefore" (keyup)="update()">
+    </mat-form-field>
+  </div>
+  <mat-divider></mat-divider>
+  <p>{{displayLearnsets.length}} Lernsets werden angezeigt | {{selectedCount}} Lernsets ausgewählt</p>
+  <ul class="actions-list">
+    <li><button mat-raised-button color="secondary" (click)="clearSelection()">Alle abwählen</button></li>
+    <li><button mat-raised-button color="primary" (click)="submit()"><b>Lernen</b></button></li>
+  </ul>
+  <mat-divider></mat-divider>
+  <br>
+  @for (learnset of learnsets; track learnset) {
+    @if (displayLearnsets.includes(learnset.getId())) {
+      <input type="checkbox" id="learnset_{{learnset.getId()}}" name="learnset_{{learnset.getId()}}" [formControl]="formControls[learnset.getId()]">
+      <mat-card appearance="raised" routerLink="/lernsets/vorschau/{{learnset.getId()}}">
+        <mat-card-header>
+          <mat-card-title>[{{learnset.getSubject().toUpperCase()}}] {{learnset.getTitle()}}</mat-card-title>
+          <mat-card-subtitle>[{{learnset.getSize()}} Elemente] {{learnset.getCreated().split('_')[0]}} bis {{learnset.getEdited().split('_')[0]}} von <i>{{learnset.getOwnerName()}}</i></mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    }
+  }
+  @if (displayLearnsets.length === 0) {
+    <p>Es konnten keine Lernsets gefunden werden, die den angegebenen Filterkriterien entsprechen.</p>
+  }
+  <br>
+  <mat-divider></mat-divider>
+  @if (displayLearnsets.length !== 0) {
+    <ul class="actions-list">
+      <button mat-raised-button color="primary" (click)="submit()"><b>Lernen</b></button>
+    </ul>
+    <mat-divider></mat-divider>
+  }
+  <br>
+  <br>
+  <br>
+</div>

@@ -1036,6 +1036,8 @@ class LearnSet:
             'owner': self.owner,
             'edited': self.edited,
             'created': self.created,
+            'owner_name': query_db('SELECT name FROM users WHERE id=?', (self.owner,), True)[0],
+            'size': query_db('SELECT COUNT(*) FROM learn_exercises WHERE set_id=?', (self.id_,), True)[0],
         }
 
     def save(self) -> None:
@@ -2305,6 +2307,22 @@ def r_api_v1_documents_data(document_id):
         'status': 'success',
         'message': 'Document retrieved successfully.',
         'document': document,
+    }, 200
+
+
+@app.route('/api/v1/learnsets/list', methods=['GET'])
+def r_api_v1_learnsets_list():
+    learnsets = []
+    result = query_db('SELECT id FROM learn_sets')
+    for i in result:
+        learnset = LearnSet.load(i[0]).__dict__()
+        learnset['created'] = learnset['created'].strftime(DATE_FORMAT)
+        learnset['edited'] = learnset['edited'].strftime(DATE_FORMAT)
+        learnsets.append(learnset)
+    return {
+        'status': 'success',
+        'message': 'learnsets retrieved successfully.',
+        'learnsets': learnsets,
     }, 200
 
 

@@ -252,6 +252,65 @@ def extract_browser(agent):
 
 
 ########################################################################################################################
+# IMPORTING
+########################################################################################################################
+
+
+def import_learnset(file: str, seperator: str = '; ') -> list[dict]:
+    file_type = 'text'
+    data: list[dict] = []
+    if file.startswith('{'):
+        file_type = 'jsonl'
+        data: list[dict] = [loads(i) for i in file.splitlines() if i.startswith('{') and i.endswith('}')]
+    elif file.startswith('['):
+        file_type = 'json'
+        data: list[dict] = loads(file)
+    output: list[dict] = []
+    if file_type.startswith('json'):
+        for element in data:
+            accept = True
+            keys = ['question', 'answer']
+            if not all(i in element for i in keys):
+                accept = False
+            if not all(isinstance(element[i], str) for i in keys):
+                accept = False
+            if 'answers' in element:
+                keys.append('answers')
+                if not isinstance(element['answers'], list):
+                    accept = False
+                elif not all(isinstance(element['answers'][i], str) for i in range(len(element['answers']))):
+                    accept = False
+            if 'frequency' in element:
+                keys.append('frequency')
+                if isinstance(element['frequency'], int):
+                    element['frequency'] = float(element['frequency'])
+                elif not isinstance(element['frequency'], float):
+                    accept = False
+            if 'auto_check' in element:
+                keys.append('auto_check')
+                if not isinstance(element['auto_check'], int):
+                    accept = False
+            if accept:
+                parsed_element = {k: element[k] for k in keys}
+                output.append(parsed_element)
+    elif file_type == 'text':
+        for line in file.splitlines():
+            if line.count(seperator) > 0:
+                question = line.split(seperator)[0]
+                answer_string = line.split(seperator, 1)[1]
+                if answer_string.count(seperator) > 0:
+                    answers = answer_string.split(seperator)
+                    answer = answers[0]
+                else:
+                    answers = [answer_string]
+                    answer = answer_string
+                parsed_element = {'question': question, 'answer': answer, 'answers': answers,
+                                  'frequency': 1.0, 'auto_check': 1}
+                output.append(parsed_element)
+    return output
+
+
+########################################################################################################################
 # CLASSES
 ########################################################################################################################
 
@@ -992,7 +1051,7 @@ class Document:
 class LearnSet:
 
     def __init__(self, id_: str = None, title: str = '', subject: str = '', description: str = '', class_: str = '',
-                 grade: str = '', language: str = '', owner: str = '', edited: datetime = None,
+                 grade: str = '-', language: str = '-', owner: str = '', edited: datetime = None,
                  created: datetime = None) -> None:
         self._id = ''
         self._title = ''
@@ -1084,7 +1143,17 @@ class LearnSet:
         result = query_db('SELECT * FROM learn_sets WHERE id=?', (learn_set_id,), True)
         if not result:
             raise KeyError(f"No LearnSet with the id #{learn_set_id} has been found")
-        return LearnSet(*result)
+        learnset = LearnSet(result[0])
+        learnset._title = result[1]
+        learnset._subject = result[2]
+        learnset._description = result[3]
+        learnset._class = result[4]
+        learnset._grade = result[5]
+        learnset._language = result[6]
+        learnset._owner = result[7]
+        learnset._edited = result[8]
+        learnset._created = result[9]
+        return learnset
 
     @property
     def id_(self) -> str:
@@ -1134,7 +1203,7 @@ class LearnSet:
 
     @language.setter
     def language(self, v: str) -> None:
-        if v not in LANGUAGES.keys():
+        if v not in LANGUAGES:
             raise ValueError(f"{v} is not a valid language")
         self._language = v
 
@@ -1144,7 +1213,7 @@ class LearnSet:
 
     @owner.setter
     def owner(self, v: str) -> None:
-        if not query_db('SELECT id FROM users WHERE id=?', (v,), True):
+        if not query_db('SELECT id FROM users WHERE id=?', (v,), True) and v != '':
             raise ValueError(f"No user with id #{v} exists")
         self._owner = v
 
@@ -2185,7 +2254,7 @@ def r_api_v1_documents_list():
 
 @app.route('/api/v1/documents/new/form', methods=['POST'])
 @login_required
-def r_api_v1_documents_upload():
+def r_api_v1_documents_new_form():
     form = dict(request.form)
     if 'file' not in request.files:
         return {
@@ -2236,7 +2305,7 @@ def r_api_v1_documents_upload():
 
 @app.route('/api/v1/documents/edit/form', methods=['POST'])
 @login_required
-def r_api_v1_documents_edit():
+def r_api_v1_documents_edit_form():
     form = dict(request.form)
     if 'file' not in request.files:
         return {
@@ -2323,6 +2392,75 @@ def r_api_v1_learnsets_list():
         'status': 'success',
         'message': 'learnsets retrieved successfully.',
         'learnsets': learnsets,
+    }, 200
+
+
+@app.route('/api/v1/learnsets/new/form', methods=['POST'])
+@login_required
+def r_api_v1_learnsets_new_form():
+    form = dict(request.form)
+    if 'file' not in request.files:
+        return {
+            'error': 'missing file',
+            'message': 'No file was uploaded.',
+        }, 415
+    file = request.files['file']
+    if not all(form.get(i, '') for i in [
+        'title',
+        'subject',
+        'description',
+        'class',
+        'grade',
+        'language',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `title`, `subject`, `class`, '
+                       '`grade`, `language`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    file_stream = file.stream
+    file_contents = file_stream.read().decode('utf-8')
+    file_stream.close()
+    try:
+        learnset_contents = import_learnset(file_contents)
+    except Exception as e:
+        logging_log(LOG_ERROR, e)
+        return {
+            'error': 'invalid file',
+            'message': 'An error occurred while parsing the file.',
+        }, 415
+    if not learnset_contents:
+        return {
+            'error': 'invalid file',
+            'message': 'The file could not be parsed.',
+        }, 415
+    learnset = LearnSet(
+        title=form['title'],
+        subject=form['subject'],
+        description=form['description'],
+        class_=form['class'],
+        grade=form['grade'],
+        language=form['language'],
+        owner=account.id_,
+        created=datetime.now(),
+        edited=datetime.now(),
+    )
+    learnset.save()
+    for element in learnset_contents:
+        exercise = LearnExercise(
+            set_id=learnset.id_,
+            question=element['question'],
+            answer=element['answer'],
+            answers=element['answers'],
+            frequency=element['frequency'],
+            auto_check=element['auto_check'],
+        )
+        exercise.save()
+    return {
+        'status': 'success',
+        'message': 'Learnset created successfully.',
+        'id': learnset.id_,
     }, 200
 
 

@@ -61,11 +61,17 @@
   <br>
   @for (learnset of learnsets; track learnset) {
     @if (displayLearnsets.includes(learnset.getId())) {
-      <input type="checkbox" id="learnset_{{learnset.getId()}}" name="learnset_{{learnset.getId()}}" [formControl]="formControls[learnset.getId()]">
-      <mat-card appearance="raised" routerLink="/lernsets/vorschau/{{learnset.getId()}}">
+      <mat-card appearance="raised">
         <mat-card-header>
-          <mat-card-title>[{{learnset.getSubject().toUpperCase()}}] {{learnset.getTitle()}}</mat-card-title>
-          <mat-card-subtitle>[{{learnset.getSize()}} Elemente] {{learnset.getCreated().split('_')[0]}} bis {{learnset.getEdited().split('_')[0]}} von <i>{{learnset.getOwnerName()}}</i></mat-card-subtitle>
+          <mat-card-title (click)="toggleFormControl(learnset.getId())">
+            @if (formControls[learnset.getId()].value) {
+              <mat-icon >check_circle</mat-icon>
+            } @else {
+              <mat-icon>radio_button_unchecked</mat-icon>
+            }
+            [{{learnset.getSubject().toUpperCase()}}] {{learnset.getTitle()}}
+          </mat-card-title>
+          <mat-card-subtitle routerLink="/lernsets/vorschau/{{learnset.getId()}}">[{{learnset.getSize()}} Elemente] {{learnset.getCreated().split('_')[0]}} bis {{learnset.getEdited().split('_')[0]}} von <i>{{learnset.getOwnerName()}}</i></mat-card-subtitle>
         </mat-card-header>
       </mat-card>
     }
@@ -76,6 +82,7 @@
   <br>
   <mat-divider></mat-divider>
   @if (displayLearnsets.length !== 0) {
+    <br>
     <ul class="actions-list">
       <button mat-raised-button color="primary" (click)="submit()"><b>Lernen</b></button>
     </ul>

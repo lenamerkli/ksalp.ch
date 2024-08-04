@@ -10,6 +10,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {Router, RouterLink} from "@angular/router";
 import {MatAnchor, MatButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
 
 @Component({
   selector: 'app-lernsets',
@@ -27,7 +28,8 @@ import {MatAnchor, MatButton} from "@angular/material/button";
     RouterLink,
     FormsModule,
     MatAnchor,
-    MatButton
+    MatButton,
+    MatIcon
   ],
   templateUrl: './lernsets.component.html',
   styleUrl: './lernsets.component.scss'
@@ -128,5 +130,10 @@ export class LernsetsComponent implements OnInit {
       }
     }
     this.router.navigate(['/learnsets/lernen/' + selectedLearnsets.join('.')]).then(_ => {});
+  }
+
+  toggleFormControl(id: string) {
+    this.formControls[id].setValue(!this.formControls[id].value);
+    this.updateSelectionCount();
   }
 }

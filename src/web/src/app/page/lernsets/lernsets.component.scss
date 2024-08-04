@@ -12,6 +12,14 @@ mat-card{
   text-align-last: left;
   max-width: 32em;
 }
+mat-card-title{
+  display: inline-flex;
+  & mat-icon{
+    font-size: 1em;
+    margin: 0.2em 0 0;
+    padding: 0;
+  }
+}
 .actions-list{
   list-style: none;
   display: inline-flex;

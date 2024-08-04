@@ -1164,6 +1164,14 @@ class LearnSet:
         self._id = v
 
     @property
+    def title(self) -> str:
+        return self._title
+
+    @title.setter
+    def title(self, v: str) -> None:
+        self._title = v
+
+    @property
     def subject(self) -> str:
         return self._subject
 

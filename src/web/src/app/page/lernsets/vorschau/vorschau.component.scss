@@ -1,0 +1,13 @@
+.links{
+  & a{
+    margin: 0.5em;
+  }
+}
+.cards{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  & mat-card{
+    margin: 0.5em;
+  }
+}

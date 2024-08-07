@@ -1794,6 +1794,17 @@ def r_dateien_dokumente(id_: str, name: str):
     return resp
 
 
+@app.route('/dateien/lernsets/<string:id_>/<string:name>', methods=['GET'])
+def r_dateien_lernsets(id_: str, name: str):
+    db_result = query_db('SELECT * FROM learn_exercises WHERE set_id=?', (id_,))
+    result = []
+    for i in db_result:
+        result.append(LearnExercise.load(i[0]).__dict__())
+    resp = make_response(dumps(result))
+    resp.headers['Content-Disposition'] = f"inline; filename={name}"
+    resp.mimetype = 'application/json'
+    return resp
+
 @app.route('/api/v1/account', methods=['GET'])
 def r_api_v1_account():
     r = {'valid': False, 'paid': False, 'info': {}}
@@ -2565,6 +2576,30 @@ def r_api_v1_learnsets_edit_form():
         'status': 'success',
         'message': 'Learnset edited successfully.',
     }
+
+
+@app.route('/api/v1/learnsets/data/<learnset_id>', methods=['GET'])
+def r_api_v1_learnsets_data(learnset_id):
+    try:
+        learnset = LearnSet.load(learnset_id).__dict__()
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
+        return {
+            'error': 'learnset not found',
+            'message': 'The requested learnset could not be found.',
+        }, 404
+    learnset['created'] = learnset['created'].strftime(DATE_FORMAT)
+    learnset['edited'] = learnset['edited'].strftime(DATE_FORMAT)
+    exercises = []
+    for element in query_db('SELECT id FROM learn_exercises WHERE set_id=?', (learnset_id,)):
+        exercise = LearnExercise.load(element[0]).__dict__()
+        exercises.append(exercise)
+    return {
+        'status': 'success',
+        'message': 'learnset retrieved successfully.',
+        'learnset': learnset,
+        'exercises': exercises,
+    }, 200
 
 
 @app.errorhandler(404)

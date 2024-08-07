@@ -15,18 +15,22 @@ import {QuellcodeComponent} from "./page/ueber/quellcode/quellcode.component";
 import {DokumenteComponent} from "./page/dokumente/dokumente.component";
 import {NeuComponent as DokumenteNeuComponent} from "./page/dokumente/neu/neu.component";
 import {NeuComponent as LernsetsNeuComponent} from "./page/lernsets/neu/neu.component";
-import {VorschauComponent} from "./page/dokumente/vorschau/vorschau.component";
-import {BearbeitenComponent} from "./page/dokumente/bearbeiten/bearbeiten.component";
+import {VorschauComponent as DokumenteVorschauComponent} from "./page/dokumente/vorschau/vorschau.component";
+import {BearbeitenComponent as DokumenteBearbeitenComponent} from "./page/dokumente/bearbeiten/bearbeiten.component";
 import {LernsetsComponent} from "./page/lernsets/lernsets.component";
+import {VorschauComponent as LernsetsVorschauComponent} from "./page/lernsets/vorschau/vorschau.component";
+import {BearbeitenComponent as LernsetsBearbeitenComponent} from "./page/lernsets/bearbeiten/bearbeiten.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
   {path: 'dokumente', component: DokumenteComponent},
   {path: 'dokumente/neu', component: DokumenteNeuComponent},
-  {path: 'dokumente/vorschau/:id', component: VorschauComponent},
-  {path: 'dokumente/bearbeiten/:id', component: BearbeitenComponent},
+  {path: 'dokumente/vorschau/:id', component: DokumenteVorschauComponent},
+  {path: 'dokumente/bearbeiten/:id', component: DokumenteBearbeitenComponent},
   {path: 'lernsets', component: LernsetsComponent},
   {path: 'lernsets/neu', component: LernsetsNeuComponent},
+  {path: 'lernsets/vorschau/:id', component: LernsetsVorschauComponent},
+  {path: 'lernsets/bearbeiten/:id', component: LernsetsBearbeitenComponent},
   {path: 'anmelden', component: AnmeldenComponent},
   {path: 'abmelden', component: AbmeldenComponent},
   {path: 'einstellungen', component: EinstellungenComponent},

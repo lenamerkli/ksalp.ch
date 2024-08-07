@@ -2530,6 +2530,7 @@ def r_api_v1_learnsets_edit_form():
     learnset.class_ = form['class']
     learnset.grade = form['grade']
     learnset.language = form['language']
+    learnset.edited = datetime.now()
     learnset.save()
     result1 = query_db('SELECT id FROM learn_exercises WHERE set_id=?', (learnset.id_,))
     existing_exercises = [i[0] for i in result1]

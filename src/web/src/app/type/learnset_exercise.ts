@@ -43,6 +43,14 @@ export class LearnsetExercise{
   public getAutoCheck(): number{
     return this.auto_check;
   }
+
+  public countAnswers(): number{
+    if (this.answers.includes(this.answer)){
+      return this.answers.length - 1;
+    }else{
+      return this.answers.length;
+    }
+  }
 }
 
 

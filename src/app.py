@@ -1333,7 +1333,14 @@ class LearnExercise:
         result = query_db('SELECT * FROM learn_exercises WHERE id=?', (learn_exercise_id,), True)
         if not result:
             raise KeyError(f"No LearnExercise with the id #{learn_exercise_id} has been found")
-        return LearnExercise(*result)
+        exercise = LearnExercise(result[0])
+        exercise._set_id = result[1]
+        exercise._question = result[2]
+        exercise._answer = result[3]
+        exercise._answers = result[4]
+        exercise._frequency = result[5]
+        exercise._auto_check = result[6]
+        return exercise
 
     @property
     def id_(self) -> str:

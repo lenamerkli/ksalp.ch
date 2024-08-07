@@ -2,7 +2,7 @@
   <h2>Lernset bearbeiten</h2>
   <mat-divider></mat-divider>
   @if (learnset === null) {
-    <p>Lädt...</p> <mat-spinner></mat-spinner> <p>Lädt...</p>
+    <p>Lädt...</p>
   } @else if (account !== null && account.isValid() && account.getId() === learnset.getOwner()) {
     <p>Sie sind dabei, das Lernset <a routerLink="/dokumente/vorschau/{{learnset.getId()}}">{{learnset.getId()}}</a> zu bearbeiten.</p>
     <mat-divider></mat-divider>

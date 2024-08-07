@@ -91,7 +91,7 @@ export class BearbeitenComponent {
     this.activatedRoute.params.subscribe({
       next: (params) => {
         this.learnsetId = params['id'];
-        this.httpClient.get<Dto>('/api/v1/documents/data/' + this.learnsetId).subscribe({
+        this.httpClient.get<Dto>('/api/v1/learnsets/data/' + this.learnsetId).subscribe({
           next: (value) => {
             if (value.learnset) {
               this.learnset = new LearnSet(value.learnset);

@@ -2472,6 +2472,100 @@ def r_api_v1_learnsets_new_form():
     }, 200
 
 
+@app.route('/api/v1/learnsets/edit/form', methods=['POST'])
+@login_required
+def r_api_v1_learnsets_edit_form():
+    form = dict(request.form)
+    if 'file' not in request.files:
+        return {
+            'error': 'missing file',
+            'message': 'No file was uploaded.',
+        }, 415
+    file = request.files['file']
+    if not all(form.get(i, '') for i in [
+        'title',
+        'subject',
+        'description',
+        'class',
+        'grade',
+        'language',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `title`, `subject`, `class`, '
+                       '`grade`, `language`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    try:
+        learnset = LearnSet.load(form['id'])
+    except Exception:
+        return {
+            'error': 'learnset not found',
+            'message': 'The requested learnset could not be found.',
+        }
+    if learnset.owner != account.id_:
+        return {
+            'error': 'permission denied',
+            'message': 'You do not have permission to edit this learnset.',
+        }
+    file_stream = file.stream
+    file_contents = file_stream.read().decode('utf-8')
+    file_stream.close()
+    try:
+        learnset_contents = import_learnset(file_contents)
+    except Exception as e:
+        logging_log(LOG_ERROR, e)
+        return {
+            'error': 'invalid file',
+            'message': 'An error occurred while parsing the file.',
+        }, 415
+    if not learnset_contents:
+        return {
+            'error': 'invalid file',
+            'message': 'The file could not be parsed.',
+        }, 415
+    learnset.title = form['title']
+    learnset.subject = form['subject']
+    learnset.description = form['description']
+    learnset.class_ = form['class']
+    learnset.grade = form['grade']
+    learnset.language = form['language']
+    learnset.save()
+    result1 = query_db('SELECT id FROM learn_exercises WHERE set_id=?', (learnset.id_,))
+    existing_exercises = [i[0] for i in result1]
+    for element in learnset_contents:
+        existing_id = query_db('SELECT id FROM learn_exercises WHERE set_id=? AND question=?',
+                               (learnset.id_, element['question']), True)
+        if existing_id and len(existing_id) > 0 and isinstance(existing_id[0], int):
+            exercise = LearnExercise.load(existing_id[0])
+            exercise.answer = element['answer']
+            exercise.answers = element['answers']
+            exercise.frequency = element['frequency']
+            exercise.auto_check = element['auto_check']
+            exercise.save()
+            while existing_id[0] in existing_exercises:
+                existing_exercises.remove(existing_id[0])
+        else:
+            exercise = LearnExercise(
+                set_id=learnset.id_,
+                question=element['question'],
+                answer=element['answer'],
+                answers=element['answers'],
+                frequency=element['frequency'],
+                auto_check=element['auto_check'],
+            )
+            exercise.save()
+    for element in existing_exercises:
+        try:
+            query_db('DELETE FROM learn_exercises WHERE id=? AND set_id=?', (element, learnset.id_))
+        except Exception as error:
+            logging_log(LOG_ERROR, error)
+    return {
+        'status': 'success',
+        'message': 'Learnset edited successfully.',
+    }
+
+
 @app.errorhandler(404)
 def error_handler_404(*_, **__):
     res = requests_send(

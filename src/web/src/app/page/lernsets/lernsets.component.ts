@@ -129,7 +129,11 @@ export class LernsetsComponent implements OnInit {
         selectedLearnsets.push(this.learnsets[i].getId());
       }
     }
-    this.router.navigate(['/learnsets/lernen/' + selectedLearnsets.join('.')]).then(_ => {});
+    if (selectedLearnsets.length === 0) {
+      alert('Bitte wählen Sie mindestens ein Lernset aus.');
+    } else {
+      this.router.navigate(['/lernsets/lernen/' + selectedLearnsets.join('.')]).then(_ => {});
+    }
   }
 
   toggleFormControl(id: string) {

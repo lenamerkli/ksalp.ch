@@ -20,6 +20,7 @@ import {BearbeitenComponent as DokumenteBearbeitenComponent} from "./page/dokume
 import {LernsetsComponent} from "./page/lernsets/lernsets.component";
 import {VorschauComponent as LernsetsVorschauComponent} from "./page/lernsets/vorschau/vorschau.component";
 import {BearbeitenComponent as LernsetsBearbeitenComponent} from "./page/lernsets/bearbeiten/bearbeiten.component";
+import {LernenComponent} from "./page/lernsets/lernen/lernen.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -31,6 +32,7 @@ export const routes: Routes = [
   {path: 'lernsets/neu', component: LernsetsNeuComponent},
   {path: 'lernsets/vorschau/:id', component: LernsetsVorschauComponent},
   {path: 'lernsets/bearbeiten/:id', component: LernsetsBearbeitenComponent},
+  {path: 'lernsets/lernen/:ids', component: LernenComponent},
   {path: 'anmelden', component: AnmeldenComponent},
   {path: 'abmelden', component: AbmeldenComponent},
   {path: 'einstellungen', component: EinstellungenComponent},

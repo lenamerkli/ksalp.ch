@@ -1,0 +1,55 @@
+<div id="container">
+  @if (account === null || !account.isValid()) {
+    <p><small>Sie sind nicht angemeldet. Für nicht angemeldete Nutzer*innen steht diese Funktion nur eingeschränkt zur Verfügung.</small></p>
+  }
+  @if (connectionError){
+    <p class="connection-error">Statistiken konnten nicht gespeichert werden, da die Verbindung zum Server fehlgeschlagen ist.</p>
+  }
+  <h2>Mit Lernsets lernen</h2>
+  <br>
+  <mat-divider></mat-divider>
+  <br>
+  <div id="div-question" [style.display]="window === 'question' ? 'block' : 'none'">
+    <p>Frage:</p>
+    <h3>{{data['question']}}</h3>
+    <br>
+    <mat-form-field [style.width.em]="48">
+      <mat-label>Ihre Antwort</mat-label>
+      <textarea rows="8" matInput id="answer" #userInput></textarea>
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="continue()">Weiter</button>
+    <br>
+    <br>
+  </div>
+  <div id="div-answer" [style.display]="window === 'answer' ? 'block' : 'none'">
+    <p>Frage:</p>
+    <h3>{{data['question']}}</h3>
+    <br>
+    <p>Korrekte Antwort:</p>
+    <h3>{{data['answer']}}</h3>
+    <br>
+    <p>Antwort:</p>
+    <h3>{{data['userAnswer']}}</h3>
+    <br>
+    <button mat-raised-button color="green" (click)="submit(true)" id="correct-button">Richtig</button>
+    <button mat-raised-button color="red" (click)="submit(false)">Falsch</button>
+    <br>
+    <br>
+  </div>
+  @if (['question', 'answer'].includes(window)) {
+    <br>
+    <mat-divider></mat-divider>
+    <br>
+    <ul>
+      @for (line of statsString.split('\n'); track line) {
+        @if (line.length > 0){
+          <li>{{line}}</li>
+        }
+      }
+    </ul>
+  } @else{
+    <p>Lädt...</p>
+    <p>Bitte warten Sie einen Moment, während das Lernprogramm gestartet wird.</p>
+  }
+</div>

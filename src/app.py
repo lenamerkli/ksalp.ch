@@ -2609,6 +2609,84 @@ def r_api_v1_learnsets_data(learnset_id):
     }, 200
 
 
+@app.route('/api/v1/learnsets/bulk/<learnset_ids>', methods=['GET'])
+def r_api_v1_learnsets_bulk(learnset_ids):
+    ids = learnset_ids.split('.')
+    learnsets = []
+    try:
+        for element in ids:
+            learnset = LearnSet.load(element).__dict__()
+            learnset['created'] = learnset['created'].strftime(DATE_FORMAT)
+            learnset['edited'] = learnset['edited'].strftime(DATE_FORMAT)
+            learnsets.append(learnset)
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
+        return {
+            'error': 'learnsets not found',
+            'message': 'The requested learnsets could not be found.',
+        }, 404
+    exercises = []
+    for element_id in ids:
+        for element in query_db('SELECT id FROM learn_exercises WHERE set_id=?', (element_id,)):
+            exercise = LearnExercise.load(element[0]).__dict__()
+            exercises.append(exercise)
+    stats = {}
+    try:
+        try:
+            account = Login.load(session['account']).get_account()
+            for exercise in exercises:
+                result = query_db('SELECT id FROM learn_stats WHERE exercise_id=? AND owner=?',
+                                  (exercise['id_'], account.id_), True)
+                if result:
+                    stats[exercise['id_']] = LearnStat.load(result[0]).__dict__()
+        except KeyError:
+            pass
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
+    return {
+        'status': 'success',
+        'message': 'learnsets retrieved successfully.',
+        'learnsets': learnsets,
+        'exercises': exercises,
+        'stats': stats,
+    }
+
+
+@app.route('/api/v1/learnsets/answer/<exercise_id>', methods=['POST'])
+@login_required
+def r_api_v1_learnsets_answer(exercise_id: str):
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if (('answer' not in data) or ('value' not in data)
+            or (not isinstance(data['answer'], str)) or (not isinstance(data['value'], bool))):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `answer`, `value`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    result = query_db('SELECT id FROM learn_stats WHERE exercise_id=? AND owner=?', (exercise_id, account.id_), True)
+    if result:
+        learn_stat = LearnStat.load(result[0])
+    else:
+        learn_stat = LearnStat(
+            exercise_id=exercise_id,
+            owner=account.id_,
+        )
+    if data['value']:
+        learn_stat.correct += 1
+    else:
+        learn_stat.wrong += 1
+    learn_stat.save()
+    return {
+        'status': 'success',
+        'message': 'The statistics have been updated.',
+    }
+
+
 @app.errorhandler(404)
 def error_handler_404(*_, **__):
     res = requests_send(

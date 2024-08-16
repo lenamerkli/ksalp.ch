@@ -22,6 +22,28 @@ CREATE TABLE IF NOT EXISTS comments (
     subject TEXT NOT NULL,
     posted TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS calendars (
+    id TEXT PRIMARY KEY,
+    owner TEXT NOT NULL,
+    access TEXT NOT NULL,
+    name TEXT NOT NULL,
+    color TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS calendar_events (
+    id TEXT PRIMARY KEY,
+    calendar TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    start TEXT NOT NULL,
+    end TEXT NOT NULL,
+    color TEXT NOT NULL,
+    schulnetz TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS calendar_selections (
+    id TEXT PRIMARY KEY,
+    owner TEXT NOT NULL,
+    calendar TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS documents (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,

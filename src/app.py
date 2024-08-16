@@ -45,9 +45,9 @@ with open(join(app.root_path, 'resources', 'key.bin'), 'rb') as _f:
 app.secret_key = _secret_key
 
 app.config.update(
-    SESSION_COOKIE_NAME='__Host-session',
+    SESSION_COOKIE_NAME='session',
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SECURE=False,
     SESSION_COOKIE_SAMESITE='Strict',
     PERMANENT_SESSION_LIFETIME=timedelta(days=128),
 )
@@ -1739,6 +1739,296 @@ class Login:
         return User.load(self._account)
 
 
+class Calendar:
+
+    def __init__(self, id_: str = None, owner: str = '', access: str = '', name: str = '', color: str = ''):
+        self._id = ''
+        self._owner = ''
+        self._access = ''
+        self._name = ''
+        self._color = ''
+        if id_ is None:
+            id_ = rand_base64(9)
+        self.id_ = id_
+        self.owner = owner
+        self.access = access
+        self.name = name
+        self.color = color
+
+    def __str__(self) -> str:
+        return f"Calendar #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'owner': self.owner,
+            'access': self.access,
+            'name': self.name,
+            'color': self.color,
+            'ownerName': query_db('SELECT name FROM users WHERE id=?', (self.owner,), True)[0]
+        }
+
+    def save(self) -> None:
+        """
+        Saves the Calendar in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No Calendar id')
+        if not query_db('SELECT id FROM calendars WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO calendars VALUES (?, ?, ?, ?, ?)', (
+                self._id,
+                self._owner,
+                self._access,
+                self._name,
+                self._color,
+            ))
+        else:
+            query_db('UPDATE calendars SET owner=?, access=?, name=?, color=? WHERE id=?', (
+                self._owner,
+                self._access,
+                self._name,
+                self._color,
+            ))
+
+    @staticmethod
+    def load(calendar_id):
+        """
+        loads a Calendar from the database
+        :param calendar_id: calendar id
+        :return: a new Calendar instance
+        """
+        result = query_db('SELECT * FROM calendars WHERE id=?', (calendar_id,), True)
+        if not result:
+            raise KeyError(f"No Calendar with the id #{calendar_id} has been found")
+        calendar = Calendar(id_=result[0])
+        calendar._owner = result[1]
+        calendar._access = result[2]
+        calendar._name = result[3]
+        calendar._color = result[4]
+        return calendar
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def owner(self) -> str:
+        return self._owner
+
+    @owner.setter
+    def owner(self, v: str) -> None:
+        if not query_db('SELECT id FROM users WHERE id=?', (self.owner,), True) and v != '':
+            raise ValueError(f"No user with id #{v} has been found")
+        self._owner = v
+
+    @property
+    def access(self) -> str:
+        return self._access
+
+    @access.setter
+    def access(self, v: str) -> None:
+        self._access = v
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, v: str) -> None:
+        self._name = v
+
+    @property
+    def color(self) -> str:
+        return self._color
+
+    @color.setter
+    def color(self, v: str) -> None:
+        self._color = v
+
+
+def check_calendar_access(access: str, account: User, write: bool = False) -> bool:
+    user_strings = list([f"%{i}" for i in account.classes])
+    if write:
+        if '|' in access:
+            access_list = access.split('|')[1].strip().split(' ')
+        else:
+            access_list = []
+    else:
+        access_list = access.replace('|', '').split(' ')
+        user_strings.append('*')
+    return any(i in access_list for i in user_strings)
+
+
+class CalendarEvent:
+
+    def __init__(self, id_: str = None, calendar: str = '', title: str = '', description: str = '',
+                 start: datetime = None, end: datetime = None, color: str = '', schulnetz: str = ''):
+        self._id = ''
+        self._calendar = ''
+        self._title = ''
+        self._description = ''
+        self._start = ''
+        self._end = ''
+        self._color = ''
+        self._schulnetz = ''
+        if id_ is None:
+            id_ = rand_base64(14)
+        if start is None:
+            start = datetime.now()
+        if end is None:
+            end = datetime.now()
+        self.id_ = id_
+        self.calendar = calendar
+        self.title = title
+        self.description = description
+        self.start = start
+        self.end = end
+        self.color = color
+        self.schulnetz = schulnetz
+
+    def __str__(self) -> str:
+        return f"CalendarEvent #{self.id_}"
+
+    def __dict__(self) -> dict:
+        return {
+            'id_': self.id_,
+            'calendar': self.calendar,
+            'title': self.title,
+            'description': self.description,
+            'start': self.start,
+            'end': self.end,
+            'color': self.color,
+            'schulnetz': self.schulnetz,
+        }
+
+    def save(self) -> None:
+        """
+        Saves the CalendarEvent in the database.
+        :return: None
+        """
+        if self._id is None:
+            raise ValueError('No CalendarEvent id')
+        if not query_db('SELECT id FROM calendar_events WHERE id=?', (self._id,), True):
+            query_db('INSERT INTO calendar_events VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (
+                self._id,
+                self._calendar,
+                self._title,
+                self._description,
+                self._start,
+                self._end,
+                self._color,
+                self._schulnetz,
+            ))
+        else:
+            query_db('UPDATE calendar_events SET calendar=?, title=?, description=?, start=?, end=?, color=?,'
+                     ' schulnetz=? WHERE id=?', (
+                self._calendar,
+                self._title,
+                self._description,
+                self._start,
+                self._end,
+                self._color,
+                self._schulnetz,
+                self._id,
+            ))
+
+    @staticmethod
+    def load(calendar_event_id):
+        """
+        loads a CalendarEvent from the database
+        :param calendar_event_id: a CalendarEvent id
+        :return: a new CalendarEvent instance
+        """
+        result = query_db('SELECT * FROM calendar_events WHERE id=?', (calendar_event_id,), True)
+        if not result:
+            raise KeyError(f"No CalendarEvent with id #{calendar_event_id} has been found")
+        calendar_event = CalendarEvent(id_=result[0])
+        calendar_event._calendar = result[1]
+        calendar_event._title = result[2]
+        calendar_event._description = result[3]
+        calendar_event._start = result[4]
+        calendar_event._end = result[5]
+        calendar_event._color = result[6]
+        calendar_event._schulnetz = result[7]
+        return calendar_event
+
+    @property
+    def id_(self) -> str:
+        return self._id
+
+    @id_.setter
+    def id_(self, v: str) -> None:
+        self._id = v
+
+    @property
+    def calendar(self) -> str:
+        return self._calendar
+
+    @calendar.setter
+    def calendar(self, v: str) -> None:
+        if not query_db('SELECT id FROM calendars WHERE id=?', (self._id,), True):
+            raise ValueError(f"No Calendar with the id #{v} has been found")
+        self._calendar = v
+
+    @property
+    def title(self) -> str:
+        return self._title
+
+    @title.setter
+    def title(self, v: str) -> None:
+        self._title = v
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @description.setter
+    def description(self, v: str) -> None:
+        self._description = v
+
+    @property
+    def start(self) -> datetime:
+        return datetime.strptime(self._start, DATE_FORMAT)
+
+    @start.setter
+    def start(self, v: datetime) -> None:
+        self._start = v.strftime(DATE_FORMAT)
+
+    @property
+    def end(self) -> datetime:
+        return datetime.strptime(self._end, DATE_FORMAT)
+
+    @end.setter
+    def end(self, v: datetime) -> None:
+        self._end = v.strftime(DATE_FORMAT)
+
+    @property
+    def color(self) -> str:
+        return self._color
+
+    @color.setter
+    def color(self, v: str) -> None:
+        self._color = v
+
+    @property
+    def schulnetz(self) -> str:
+        return self._schulnetz
+
+    @schulnetz.setter
+    def schulnetz(self, v: str) -> None:
+        self._schulnetz = v
+
+
+########################################################################################################################
+# DECORATORS
+########################################################################################################################
+
+
 def login_required(func):
     def wrapper(*args, **kwargs):
         r = {'error': 'account required'}, 401
@@ -2684,6 +2974,71 @@ def r_api_v1_learnsets_answer(exercise_id: str):
     return {
         'status': 'success',
         'message': 'The statistics have been updated.',
+    }
+
+
+@app.route('/api/v1/calendars/list', methods=['GET'])
+@login_required
+def r_api_v1_calendars_list():
+    account = Login.load(session['account']).get_account()
+    result = query_db('SELECT id, access FROM calendars')
+    accessible = [i[0] for i in result if check_calendar_access(i[1], account)]
+    calendars = []
+    for element in accessible:
+        try:
+            calendars.append(Calendar.load(element[0]).__dict__())
+        except Exception as error:
+            logging_log(LOG_ERROR, error)
+    events = []
+    for calendar in calendars:
+        for event in query_db('SELECT id FROM calendar_events WHERE calendar=?', (calendar['id_'],)):
+            try:
+                events.append(CalendarEvent.load(event[0]).__dict__())
+            except Exception as error:
+                logging_log(LOG_ERROR, error)
+    return {
+        'status': 'success',
+        'message': 'Calendar events have been retrieved.',
+        'calendars': calendars,
+        'events': events,
+    }, 200
+
+
+@app.route('/api/v1/calendars/selection', methods=['GET'])
+@login_required
+def r_api_v1_calendars_selection():
+    account = Login.load(session['account']).get_account()
+    result = query_db('SELECT calendar FROM calendar_selections WHERE owner=?', (account.id_,))
+    selection = [str(i[0]) for i in result]
+    return {
+        'status': 'success',
+        'message': 'Calendar selections have been retrieved.',
+        'selection': selection,
+    }, 200
+
+
+@app.route('/api/v1/calendars/selection/update', methods=['POST'])
+@login_required
+def r_api_v1_calendars_selection_update():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if ('value' not in data) or (not isinstance(data['value'], list)):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `value`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    query_db('DELETE FROM calendar_selections WHERE owner=?', (account.id_,))
+    for element in data['value']:
+        element_id = rand_base64(19)
+        query_db('INSERT INTO calendar_selections VALUES (?, ?, ?)', (element_id, account.id_, str(element)))
+    return {
+        'status': 'success',
+        'message': 'Calendar selections have been updated.',
     }
 
 

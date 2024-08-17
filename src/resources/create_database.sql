@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     theme TEXT NOT NULL,
     iframe INTEGER NOT NULL,
     payment TEXT NOT NULL,
+    payment_lite TEXT NOT NULL,
     banned TEXT NOT NULL,
     search TEXT NOT NULL,
     class TEXT NOT NULL,

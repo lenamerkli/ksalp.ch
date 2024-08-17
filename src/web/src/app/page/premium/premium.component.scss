@@ -1,0 +1,20 @@
+table{
+  border-collapse: collapse;
+  width: 100%;
+  th, td {
+    text-align: justify;
+    text-align-last: center;
+    padding: 0.5em;
+    border: 1px solid #ddd;
+  }
+  tr:nth-child(odd){
+    background-color: #f2f2f2;
+  }
+  td:nth-child(1){
+    text-align: right;
+  }
+  th {
+    background-color: #005cbb;
+    color: white;
+  }
+}

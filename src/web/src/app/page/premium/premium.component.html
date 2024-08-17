@@ -1,0 +1,92 @@
+<div id="container">
+  <h2>Premium</h2>
+  @if (account !== null && account.isPaid()) {
+    <p>Ihr Premium-Abo ist gültig bis {{account.paymentEnd().utcOffset('Europe/Zurich').format('DD.MM.YYYY')}}.</p>
+  } @else if (account !== null && account.isPaidLite()) {
+    <p>Ihr Premium-Lite-Abonnement ist gültig bis {{account.paymentLiteEnd().utcOffset('Europe/Zurich').format('DD.MM.YYYY')}}.</p>
+  } @else {
+    <p>Sie besitzen noch kein Premium-Abonnement.</p>
+  }
+  <h3>Vorteile vergleichen</h3>
+  <table>
+    <tr>
+      <th [style.border] ="'none'" [style.background-color]="'white'"></th>
+      <th>Standard</th>
+      <th>Premium Lite</th>
+      <th>Premium</th>
+    </tr>
+    <tr>
+      <td>Preis pro Jahr</td>
+      <td>Kostenlos</td>
+      <td>CHF 4.-</td>
+      <td>CHF 20.-</td>
+    </tr>
+    <tr>
+      <td>Dokumente hochladen</td>
+      <td>Ja</td>
+      <td>Ja</td>
+      <td>Ja</td>
+    </tr>
+    <tr>
+      <td>Maximale Dokumentgrösse <sup>1</sup></td>
+      <td>300 MiB</td>
+      <td>700 MiB</td>
+      <td>1'500 MiB</td>
+    </tr>
+    <tr>
+      <td>Lernsets hochladen</td>
+      <td>Ja</td>
+      <td>Ja</td>
+      <td>Ja</td>
+    </tr>
+    <tr>
+      <td>Maximale Lernsetgrösse <sup>2</sup></td>
+      <td>2'000</td>
+      <td>5'000</td>
+      <td>10'000</td>
+    </tr>
+    <tr>
+      <td>Lernset Statistiken</td>
+      <td>Ja</td>
+      <td>Ja</td>
+      <td>Ja</td>
+    </tr>
+    <tr>
+      <td>Maximale Anzahl Lernset Statistiken <sup>3</sup></td>
+      <td>Unlimitiert</td>
+      <td>Unlimitiert</td>
+      <td>Unlimitiert</td>
+    </tr>
+    <tr>
+      <td>Farbschema auswählen <sup>4</sup></td>
+      <td>Nein</td>
+      <td>Ja</td>
+      <td>Ja</td>
+    </tr>
+    <tr>
+      <td>Anzahl Kalender <sup>5</sup></td>
+      <td>2</td>
+      <td>5</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td colspan="2" [style.border]="'none'" [style.background-color]="'white'"></td>
+      @if (account !== null && account.isPaid()) {
+        <td [style.border]="'none'" [style.background-color]="'white'"></td>
+        <td><a mat-raised-button color="primary" routerLink="/premium/kaufen">Verlängern</a></td>
+      } @else if (account !== null && account.isPaidLite()) {
+          <td><a mat-raised-button color="primary" routerLink="/premium/lite/kaufen">Verlängern</a></td>
+      } @else {
+        <td><a mat-raised-button color="primary" routerLink="/premium/lite/kaufen">Kaufen</a></td>
+      }
+      @if (!(account !== null && account.isPaid())) {
+          <td><a mat-raised-button color="primary" routerLink="/premium/kaufen">Kaufen</a></td>
+      }
+    </tr>
+  </table>
+  <p>Mit dem Kauf eines Premium-Abonnements unterstützen Sie ksalp.ch.</p>
+  <br>
+  <p><small><sup>1 2 3</sup> Es gibt aus technischen Gründen eine globale Limite.</small></p>
+  <p><small><sup>4 5</sup> Diese Funktion ist in Arbeit und noch nicht verfügbar.</small></p>
+  <p><small><sup>5</sup> Zwei Kalender von dieser Limite sind reserviert.</small></p>
+</div>

@@ -318,9 +318,9 @@ def import_learnset(file: str, seperator: str = '; ') -> list[dict]:
 class User:
 
     def __init__(self, id_: str = None, name: str = '', mail: str = '', salt: bytes = b'', hash_: bytes = b'',
-                 newsletter: int = 0, created: datetime = None, theme: str = 'light', iframe: int = 0, payment: datetime = None,
-                 banned: list = None, search: str = 'Startpage', classes: list = None, grade: str = '-',
-                 favorites: list = None) -> None:
+                 newsletter: int = 0, created: datetime = None, theme: str = 'light', iframe: int = 0,
+                 payment: datetime = None, payment_lite: datetime = None, banned: list = None,
+                 search: str = 'Startpage', classes: list = None, grade: str = '-', favorites: list = None) -> None:
         self._id = ''
         self._name = ''
         self._mail = ''
@@ -331,6 +331,7 @@ class User:
         self._theme = 'light'
         self._iframe = 0
         self._payment = ''
+        self._payment_lite = ''
         self._banned = ''
         self._search = 'Startpage'
         self._classes = ''
@@ -342,6 +343,8 @@ class User:
             created = datetime.now()
         if payment is None:
             payment = datetime.strptime('2000-01-01', '%Y-%m-%d')
+        if payment_lite is None:
+            payment_lite = datetime.strptime('2000-01-01', '%Y-%m-%d')
         if banned is None:
             banned = []
         if classes is None:
@@ -370,6 +373,7 @@ class User:
         self.theme = theme
         self.iframe = iframe
         self.payment = payment
+        self.payment_lite = payment_lite
         self.banned = banned
         self.search = search
         self.classes = classes
@@ -391,6 +395,7 @@ class User:
             'theme': self.theme,
             'iframe': self.iframe,
             'payment': self.payment,
+            'payment_lite': self.payment_lite,
             'banned': self.banned,
             'search': self.search,
             'classes': self.classes,
@@ -411,6 +416,7 @@ class User:
             'theme': self.theme,
             'iframe': self.iframe,
             'payment': self.payment,
+            'payment_lite': self.payment_lite,
             'banned': self.banned,
             'search': self.search,
             'classes': self.classes,
@@ -426,7 +432,7 @@ class User:
         if self._id is None:
             raise ValueError('No user id')
         if not query_db('SELECT id FROM users WHERE id=?', (self._id,), True):
-            query_db('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
+            query_db('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (
                 self._id,
                 self._name,
                 self._mail,
@@ -437,6 +443,7 @@ class User:
                 self._theme,
                 self._iframe,
                 self._payment,
+                self._payment_lite,
                 self._banned,
                 self._search,
                 self._classes,
@@ -444,24 +451,25 @@ class User:
                 self._favorites,
             ))
         else:
-            query_db('UPDATE users SET name=?, mail=?, salt=?, hash=?, newsletter=?, created=?, theme=?, iframe=?, payment=?, '
-                     'banned=?, search=?, class=?, grade=?, favorites=? WHERE id=?', (
-                         self._name,
-                         self._mail,
-                         self._salt,
-                         self._hash,
-                         self._newsletter,
-                         self._created,
-                         self._theme,
-                         self._iframe,
-                         self._payment,
-                         self._banned,
-                         self._search,
-                         self._classes,
-                         self._grade,
-                         self._favorites,
-                         self._id
-                     ))
+            query_db('UPDATE users SET name=?, mail=?, salt=?, hash=?, newsletter=?, created=?, theme=?, iframe=?, '
+                     'payment=?, payment_lite=?, banned=?, search=?, class=?, grade=?, favorites=? WHERE id=?', (
+                self._name,
+                self._mail,
+                self._salt,
+                self._hash,
+                self._newsletter,
+                self._created,
+                self._theme,
+                self._iframe,
+                self._payment,
+                self._payment_lite,
+                self._banned,
+                self._search,
+                self._classes,
+                self._grade,
+                self._favorites,
+                self._id
+            ))
 
     @staticmethod
     def load(user_id):
@@ -472,32 +480,6 @@ class User:
         result = query_db('SELECT * FROM users WHERE id=?', (user_id,), True)
         if not result:
             raise KeyError(f"No user with the id #{user_id} has been found")
-        user = User(id_=result[0])
-        user._name = result[1]
-        user._mail = result[2]
-        user._salt = result[3]
-        user._hash = result[4]
-        user._newsletter = result[5]
-        user._created = result[6]
-        user._theme = result[7]
-        user._iframe = result[8]
-        user._payment = result[9]
-        user._banned = result[10]
-        user._search = result[11]
-        user._classes = result[12]
-        user._grade = result[13]
-        user._favorites = result[14]
-        return user
-
-    @staticmethod
-    def load_by_mail(user_mail):
-        """
-        loads a user from the database
-        :return: a new user instance
-        """
-        result = query_db('SELECT * FROM users WHERE mail=?', (user_mail,), True)
-        if not result:
-            raise KeyError(f"No user with mail `{user_mail}` has been found")
         user = User(id_=result[0])
         user._name = result[1]
         user._mail = result[2]
@@ -598,6 +580,14 @@ class User:
         self._payment = v.strftime('%Y-%m-%d')
 
     @property
+    def payment_lite(self) -> datetime:
+        return datetime.strptime(self._payment_lite, '%Y-%m-%d')
+
+    @payment_lite.setter
+    def payment_lite(self, v: datetime) -> None:
+        self._payment_lite = v.strftime('%Y-%m-%d')
+
+    @property
     def banned(self) -> list:
         return self._banned.split(', ')
 
@@ -666,6 +656,13 @@ class User:
         :return: boolean if the user has premium
         """
         return self.payment > datetime.now()
+
+    def valid_payment_lite(self) -> bool:
+        """
+        Check if the user has premium lite
+        :return: boolean if the user has premium lite
+        """
+        return self.payment_lite > datetime.now()
 
 
 class Comment:
@@ -2046,13 +2043,36 @@ def login_required(func):
 
 def premium_required(func):
     def wrapper(*args, **kwargs):
-        r = {'error': 'premium required'}, 401
+        r = {
+            'error': 'premium required',
+            'message': 'Premium subscription or above is required.',
+        }, 401
         if 'account' in session:
             try:
                 user: User = Login.load(session['account']).get_account()
-            except Exception:
+            except Exception as error:
+                logging_log(LOG_ERROR, error)
                 return r
             if user.valid_payment():
+                return func(*args, **kwargs)
+        return r
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
+def premium_lite_required(func):
+    def wrapper(*args, **kwargs):
+        r = {
+            'error': 'premium lite required',
+            'message': 'Premium Lite subscription or above is required.',
+        }, 401
+        if 'account' in session:
+            try:
+                user: User = Login.load(session['account']).get_account()
+            except Exception as error:
+                logging_log(LOG_ERROR, error)
+                return r
+            if user.valid_payment() or user.valid_payment_lite():
                 return func(*args, **kwargs)
         return r
     wrapper.__name__ = func.__name__
@@ -2104,15 +2124,16 @@ def r_dateien_lernsets(id_: str, name: str):
 
 @app.route('/api/v1/account', methods=['GET'])
 def r_api_v1_account():
-    r = {'valid': False, 'paid': False, 'info': {}}
+    r = {'valid': False, 'paid': False, 'paidLite': False, 'info': None}
     try:
         login = Login.load(session['account'])
         if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
             user = User.load(login.account)
             paid = user.valid_payment()
-            r = {'valid': True, 'paid': paid, 'info': user.json}
-    except Exception:
-        r = {'valid': False, 'paid': False, 'info': {}}
+            paid_lite = user.valid_payment_lite()
+            r = {'valid': True, 'paid': paid, 'paidLite': paid_lite, 'info': user.json}
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
     return r
 
 
@@ -2166,7 +2187,10 @@ def r_api_v1_account_signin():
             'message': 'At least one of the following required fields is missing: `email`, `password`',
         }, 415
     try:
-        user = User.load_by_mail(data['email'])
+        user_id = query_db('SELECT id FROM users WHERE mail=?', (data['email'],), True)[0]
+        if not user_id:
+            raise KeyError
+        user = User.load(user_id)
     except KeyError:
         return {
             'error': 'sign-in failed',
@@ -2331,7 +2355,7 @@ def r_api_v1_constants():
 
 @app.route('/api/v1/account/settings/theme', methods=['POST'])
 @login_required
-@premium_required
+@premium_lite_required
 def r_api_v1_account_settings_theme():
     data = request.get_json(force=True, silent=True)
     if (data is None) or (not isinstance(data, dict)):

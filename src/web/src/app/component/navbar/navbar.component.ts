@@ -33,7 +33,6 @@ import {MatDivider} from "@angular/material/divider";
 })
 export class NavbarComponent {
   @Output() closeMobile = new EventEmitter();
-  @ViewChild('documentsAll') documentsAll!: MatExpansionPanel;
   public account: Account | null = null;
   constructor(private readonly accountService: AccountService, readonly router: Router) {
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {

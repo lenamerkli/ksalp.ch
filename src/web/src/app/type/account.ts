@@ -7,16 +7,19 @@ export class Account{
   private readonly theme: string = 'light';
   private readonly iframe: boolean = false;
   private readonly payment: string = '2000-01-01';
+  private readonly payment_lite: string = '2000-01-01';
   private readonly search: string = 'Startpage';
   private readonly classes: string[] = [];
   private readonly grade: string = '-';
   private readonly favorites: string[] = [];
   private readonly valid: boolean;
   private readonly paid: boolean;
+  private readonly paidLite: boolean;
 
   constructor(dto: AccountDto) {
     this.valid = dto.valid;
     this.paid = dto.paid;
+    this.paidLite = dto.paidLite;
     if(dto.info !== null){
       this.id = dto.info.id_;
       this.name = dto.info.name;
@@ -24,6 +27,7 @@ export class Account{
       this.theme = dto.info.theme;
       this.iframe = dto.info.iframe;
       this.payment = dto.info.payment;
+      this.payment_lite = dto.info.payment_lite;
       this.search = dto.info.search;
       this.classes = dto.info.classes;
       this.grade = dto.info.grade;
@@ -55,6 +59,10 @@ export class Account{
     return this.payment;
   }
 
+  public getPaymentLite(): string{
+    return this.payment_lite;
+  }
+
   public getSearch(): string{
     return this.search;
   }
@@ -79,13 +87,22 @@ export class Account{
     return this.paid;
   }
 
+  public isPaidLite(): boolean{
+    return this.paidLite;
+  }
+
   public paymentEnd(): moment.Moment{
     return moment.utc(this.payment);
+  }
+
+  public paymentLiteEnd(): moment.Moment{
+    return moment.utc(this.payment_lite);
   }
 }
 export interface AccountDto{
   valid: boolean;
   paid: boolean;
+  paidLite: boolean;
   info: {
     id_: string,
     name: string,
@@ -93,6 +110,7 @@ export interface AccountDto{
     theme: string,
     iframe: boolean,
     payment: string,
+    payment_lite: string,
     search: string,
     classes: string[],
     grade: string,

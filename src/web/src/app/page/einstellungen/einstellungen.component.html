@@ -20,6 +20,9 @@
     @if (account.isPaid()){
       <p>Ihr Premium-Abo ist gültig bis {{account.paymentEnd().utcOffset('Europe/Zurich').format('DD.MM.YYYY')}}.</p>
       <a mat-raised-button color="primary" routerLink="/premium">Verlängern</a>
+    } @else if (account.isPaidLite()){
+      <p>Ihr Premium-Lite-Abonnement ist gültig bis {{account.paymentLiteEnd().utcOffset('Europe/Zurich').format('DD.MM.YYYY')}}.</p>
+      <a mat-raised-button color="primary" routerLink="/premium">Verlängern</a>
     } @else {
       <p>Sie besitzen kein Premium-Abonnement.
         Mit einem Premium-Abonnement erhalten Sie zusätzliche Funktionen, wie weitere Farbschemen, und Sie unterstützen ksalp.ch.
@@ -30,7 +33,7 @@
     <mat-divider></mat-divider>
     <h3 #farbschema>Farbschema</h3>
     <p>Aktuell benutzen Sie das Farbschema <i>{{themes[account.getTheme()]}}</i>.</p>
-    @if (account.isPaid()){
+    @if (account.isPaid() || account.isPaidLite()) {
       <mat-form-field [style.width.em]="24">
         <mat-label>Farbschema</mat-label>
         <mat-select [formControl]="theme">

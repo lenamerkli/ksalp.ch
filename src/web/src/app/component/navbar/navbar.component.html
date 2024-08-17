@@ -4,12 +4,11 @@
     <a routerLink="#" (click)="closeMobile.emit()">
       <mat-icon class="close-icon">close</mat-icon>
     </a>
-    <span *ngIf="account !== null && account?.isValid()">
-      Angemeldet als <i>{{account.getName()}}</i>
-    </span>
-    <span *ngIf="account === null || !(account?.isValid())">
-      Nicht angemeldet
-    </span>
+    @if (account !== null && account.isValid()) {
+      <span>Angemeldet als <i>{{account.getName()}}</i></span>
+    } @else {
+      <span>Nicht angemeldet</span>
+    }
   </p>
   <p class="desktop">
     <a routerLink="/">
@@ -25,16 +24,15 @@
     <mat-divider></mat-divider>
     <!-- <app-navbar-link link="/blog">Blog</app-navbar-link> -->
     <br class="navbar-whitespace">
-    <div *ngIf="!(account === null) && account.isValid()">
+    @if (account !== null && account.isValid()) {
       <app-navbar-link link="/abmelden">Abmelden</app-navbar-link>
       <mat-divider></mat-divider>
       <app-navbar-link link="/einstellungen">Einstellungen</app-navbar-link>
-    </div>
-    <div *ngIf="!(account === null) && !(account.isValid())">
+    } @else {
       <app-navbar-link link="/anmelden">Anmelden</app-navbar-link>
       <mat-divider></mat-divider>
       <app-navbar-link link="/registrieren">Registrieren</app-navbar-link>
-    </div>
+    }
     <mat-divider></mat-divider>
     <app-navbar-link link="/premium">Premium</app-navbar-link>
     <mat-divider></mat-divider>

@@ -3,7 +3,7 @@ EXTENSIONS = {
     'application/gzip': 'GZ',
     'application/json': 'JSON',
     'application/msword': 'DOC',
-    'application/pdf': 'PDF', 'image/tiff': 'TIFF',
+    'application/pdf': 'PDF',
     'application/rtf': 'RTF',
     'application/vnd.ms-excel': 'XLS',
     'application/vnd.ms-powerpoint': 'PPT',
@@ -24,7 +24,8 @@ EXTENSIONS = {
     'image/gif': 'GIF',
     'image/jpeg': 'JPG',
     'image/png': 'PNG',
-    'image/sgv+xml': 'SVG',
+    'image/svg+xml': 'SVG',
+    'image/tiff': 'TIFF',
     'image/webp': 'WEBP',
     'image/x-icon': 'ICO',
     'text/css': 'CSS',
@@ -65,7 +66,7 @@ FILE_TYPES = {
     'fonts/Montserrat-Medium.ttf': 'font/ttf',
     'fonts/Montserrat-MediumItalic.ttf': 'font/ttf',
     'fonts/Roboto.ttf': 'font/ttf',
-    'logo.svg': 'image/sgv+xml',
+    'logo.svg': 'image/svg+xml',
 }
 GRADES = [
     '-',

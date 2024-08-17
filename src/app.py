@@ -5,27 +5,27 @@
 ########################################################################################################################
 
 
+from base64 import urlsafe_b64encode, urlsafe_b64decode
+from datetime import timedelta, datetime
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from flask import Flask, g, session, request, Response, send_from_directory, make_response
-from os.path import join, exists, dirname, getsize
-from os import urandom, environ, listdir
-from datetime import timedelta, datetime
-from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
-from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
-from logging import INFO as LOG_INFO, log as logging_log, ERROR as LOG_ERROR
-from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import pbkdf2_hmac
-from werkzeug.utils import secure_filename
 from json import loads, dumps
+from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
+from logging import INFO as LOG_INFO, log as logging_log, ERROR as LOG_ERROR
+from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
+from os import urandom, environ, listdir
+from os.path import join, exists, dirname, getsize
 from random import uniform as rand_uniform
 from requests import request as requests_send
 from smtplib import SMTP
+from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from ssl import create_default_context
-from urllib.parse import urlparse
 from time import sleep
+from urllib.parse import urlparse
+from werkzeug.utils import secure_filename
 import typing as t
 import qrbill
 
@@ -2047,7 +2047,8 @@ def login_required(func):
         if 'account' in session:
             try:
                 login = Login.load(session['account'])
-            except Exception:
+            except Exception as error:
+                logging_log(LOG_ERROR, error)
                 return r
             if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
                 return func(*args, **kwargs)
@@ -2116,7 +2117,8 @@ def route_static(file):
 def r_dateien_dokumente(id_: str, name: str):
     try:
         result = Document.load(id_)
-    except Exception:
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
         return 'Datei konnte nicht gefunden werden', 404
     if not result:
         return 'Datei konnte nicht gefunden werden', 404
@@ -2299,13 +2301,13 @@ def r_api_v1_account_register():
     
     Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.
     
-    Das ksalp.ch Team wünscht Ihnen viel Erfolg beim lernen.
+    Das ksalp.ch Team wünscht Ihnen viel Erfolg beim Lernen.
     """
     mail_html = f"""<p>Guten Tag, {data['name']}</p>
     <p>Um die Registrierung bei ksalp.ch abzuschliessen, klicken Sie bitte auf den folgenden Link:</p>
     <p><b><a href="https://ksalp.ch/registrieren/mail/{mail.code}">https://ksalp.ch/registrieren/mail/{mail.code}</a></b></p>
     <p>Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.</p>
-    <p>Das ksalp.ch Team wünscht Ihnen viel Erfolg beim lernen.</p>
+    <p>Das ksalp.ch Team wünscht Ihnen viel Erfolg beim Lernen.</p>
     """
     result = send_mail(address=data['email'], subject='Registrierung bei ksalp.ch', message_plain=mail_plain, message=mail_html)
     if result is not None:
@@ -2349,6 +2351,7 @@ def r_api_v1_account_register_continue():
     account_data['salt'] = urlsafe_b64decode(account_data['salt'])
     account_data['hash_'] = urlsafe_b64decode(account_data['hash_'])
     account_data['theme'] = 'light'
+    account_data['iframe'] = 1
     account = User(**account_data)
     account.save()
     return {
@@ -2361,7 +2364,8 @@ def r_api_v1_account_register_continue():
 def r_api_v1_account_logout():
     try:
         login = Login.load(session['account'])
-    except Exception:
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
         return {
             'error': 'invalid account login',
             'message': 'The account login could not be found.',
@@ -2714,7 +2718,8 @@ def r_api_v1_documents_edit_form():
     extension = file.filename.split('.')[-1]
     try:
         document = Document.load(form['id'])
-    except Exception:
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
         return {
             'error': 'document not found',
             'message': 'The requested document could not be found.',
@@ -2748,7 +2753,8 @@ def r_api_v1_documents_edit_form():
 def r_api_v1_documents_data(document_id):
     try:
         document = Document.load(document_id).__dict__()
-    except Exception:
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
         return {
             'error': 'document not found',
             'message': 'The requested document could not be found.',
@@ -2873,7 +2879,8 @@ def r_api_v1_learnsets_edit_form():
     account = Login.load(session['account']).get_account()
     try:
         learnset = LearnSet.load(form['id'])
-    except Exception:
+    except Exception as error:
+        logging_log(LOG_ERROR, error)
         return {
             'error': 'learnset not found',
             'message': 'The requested learnset could not be found.',

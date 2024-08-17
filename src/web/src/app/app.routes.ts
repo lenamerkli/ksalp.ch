@@ -25,6 +25,7 @@ import {PremiumComponent} from "./page/premium/premium.component";
 import {KaufenComponent as PremiumKaufenComponent} from "./page/premium/kaufen/kaufen.component";
 import {KaufenComponent as PremiumLiteKaufenComponent} from "./page/premium/lite/kaufen/kaufen.component";
 import {KontaktComponent} from "./page/ueber/kontakt/kontakt.component";
+import {TeamComponent} from "./page/ueber/team/team.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -47,6 +48,7 @@ export const routes: Routes = [
   {path: 'registrieren/weiter', component: WeiterComponent},
   {path: 'registrieren/fertig', component: FertigComponent},
   {path: 'registrieren/mail/:mail_code', component: MailComponent},
+  {path: 'über/team', component: TeamComponent},
   {path: 'über/kontakt', component: KontaktComponent},
   {path: 'über/quellcode', component: QuellcodeComponent},
   {path: 'über/impressum', component: ImpressumComponent},

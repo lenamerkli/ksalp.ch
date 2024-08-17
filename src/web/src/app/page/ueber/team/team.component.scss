@@ -1,0 +1,22 @@
+.name{
+  font-size: 2em;
+  font-weight: bold;
+  width: 24%;
+}
+.description{
+  font-size: 1.2em;
+  width: 40%;
+}
+table{
+  table-layout: fixed;
+}
+td{
+  vertical-align: center;
+  height: 8em;
+}
+mat-divider{
+  margin: 3em 0;
+}
+a{
+  margin: 0.2em;
+}

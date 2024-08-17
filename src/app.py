@@ -37,6 +37,8 @@ from resources import *
 ########################################################################################################################
 
 
+DEVELOPMENT = True
+
 load_dotenv()
 app = Flask(__name__)
 
@@ -47,13 +49,22 @@ with open(join(app.root_path, 'resources', 'key.bin'), 'rb') as _f:
     _secret_key = _f.read()
 app.secret_key = _secret_key
 
-app.config.update(
-    SESSION_COOKIE_NAME='session',
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=False,
-    SESSION_COOKIE_SAMESITE='Strict',
-    PERMANENT_SESSION_LIFETIME=timedelta(days=128),
-)
+if DEVELOPMENT:
+    app.config.update(
+        SESSION_COOKIE_NAME='session',
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=False,
+        SESSION_COOKIE_SAMESITE='Strict',
+        PERMANENT_SESSION_LIFETIME=timedelta(days=128),
+    )
+else:
+    app.config.update(
+        SESSION_COOKIE_NAME='__Host-session',
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SECURE=True,
+        SESSION_COOKIE_SAMESITE='Strict',
+        PERMANENT_SESSION_LIFETIME=timedelta(days=128),
+    )
 
 
 ########################################################################################################################
@@ -3098,24 +3109,33 @@ def r_api_v1_calendars_selection_update():
     }
 
 
-@app.errorhandler(404)
-def error_handler_404(*_, **__):
-    res = requests_send(
-        method=request.method,
-        url='http://' + request.url.replace(request.host_url, f'localhost:4200/'),  # noqa
-        headers={k: v for k, v in request.headers if k.lower() != 'host'},
-        data=request.get_data(),
-        cookies=request.cookies,
-        allow_redirects=True,
-    )
-    excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding',
-                        'connection']
-    headers = [
-        (k, v) for k, v in res.raw.headers.items()
-        if k.lower() not in excluded_headers
-    ]
-    response = Response(res.content, res.status_code, headers)  # noqa
-    return response
+if DEVELOPMENT:
+    @app.errorhandler(404)
+    def error_handler_404(*_, **__):
+        res = requests_send(
+            method=request.method,
+            url='http://' + request.url.replace(request.host_url, f'localhost:4200/'),  # noqa
+            headers={k: v for k, v in request.headers if k.lower() != 'host'},
+            data=request.get_data(),
+            cookies=request.cookies,
+            allow_redirects=True,
+        )
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding',
+                            'connection']
+        headers = [
+            (k, v) for k, v in res.raw.headers.items()
+            if k.lower() not in excluded_headers
+        ]
+        response = Response(res.content, res.status_code, headers)  # noqa
+        return response
+else:
+    @app.route('/', defaults={'path': ''}, methods=['GET'])
+    @app.route('/<path:path>', methods=['GET'])
+    def angular_serve(path: str):
+        if path != '' and exists(relative_path(join('build', path))):
+            return send_from_directory(relative_path('build'), path)
+        else:
+            return send_from_directory(relative_path('build'), 'index.html')
 
 
 if __name__ == '__main__':

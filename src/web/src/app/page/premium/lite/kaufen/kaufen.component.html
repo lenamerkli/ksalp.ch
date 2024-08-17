@@ -1,0 +1,9 @@
+<div id="container">
+  <h2>Premium Lite Kaufen</h2>
+  @if (account === null || !account.isValid()) {
+    <p>Sie müssen angemeldet sein, um Premium Lite zu kaufen.</p>
+    <a mat-raised-button color="primary" routerLink="/anmelden">Anmelden</a>
+  } @else {
+    <img src="/api/v1/qrbill/premiumLiteYear" alt="Hier sollte der QR-Code sein. Wenn er nicht angezeigt wird, kontaktieren Sie uns.">
+  }
+</div>

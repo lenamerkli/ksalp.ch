@@ -5,6 +5,7 @@
 ########################################################################################################################
 
 
+from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
@@ -26,6 +27,7 @@ from ssl import create_default_context
 from urllib.parse import urlparse
 from time import sleep
 import typing as t
+import qrbill
 
 from resources import *
 
@@ -35,6 +37,7 @@ from resources import *
 ########################################################################################################################
 
 
+load_dotenv()
 app = Flask(__name__)
 
 if not exists(join(app.root_path, 'resources', 'key.bin')):
@@ -490,11 +493,12 @@ class User:
         user._theme = result[7]
         user._iframe = result[8]
         user._payment = result[9]
-        user._banned = result[10]
-        user._search = result[11]
-        user._classes = result[12]
-        user._grade = result[13]
-        user._favorites = result[14]
+        user._payment_lite = result[10]
+        user._banned = result[11]
+        user._search = result[12]
+        user._classes = result[13]
+        user._grade = result[14]
+        user._favorites = result[15]
         return user
 
     @property
@@ -2166,6 +2170,34 @@ def r_api_v1_favicon(path: str):
             return resp
     resp = send_from_directory(relative_path('favicons'), '_empty.png')
     resp.mimetype = EXTENSIONS_REVERSE['PNG']
+    return resp
+
+
+@app.route('/api/v1/qrbill/<product>', methods=['GET'])
+@login_required
+def r_api_v1_qrbill(product: str):
+    if (product not in PRICES.keys()) or (product not in PRODUCTS.keys()):
+        return {
+            'error': 'not found',
+            'message': 'The product was not found.',
+        }, 404
+    account = Login.load(session['account']).get_account()
+    bill = qrbill.QRBill(
+        account=environ['BILLING_ACCOUNT'].replace(' ', ''),
+        creditor={
+            'name': environ['BILLING_NAME'],
+            'line1': environ['BILLING_POSTCODE'],
+            'line2': environ['BILLING_CITY'],
+            'country': 'CH',
+        },
+        amount=PRICES[product],
+        additional_information=f"{PRODUCTS[product]} für {account.mail}",
+        language='de',
+    )
+    temp_id = rand_base64(21)
+    bill.as_svg(relative_path(f"temp/qrbills/{temp_id}.svg"))
+    resp = make_response(send_from_directory(relative_path('temp/qrbills'), f"{temp_id}.svg"))
+    resp.mimetype = 'image/svg+xml'
     return resp
 
 

@@ -31,3 +31,5 @@ logs/
 
 # generated
 build/
+tmp/
+temp/

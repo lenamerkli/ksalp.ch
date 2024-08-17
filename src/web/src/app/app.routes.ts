@@ -22,6 +22,8 @@ import {VorschauComponent as LernsetsVorschauComponent} from "./page/lernsets/vo
 import {BearbeitenComponent as LernsetsBearbeitenComponent} from "./page/lernsets/bearbeiten/bearbeiten.component";
 import {LernenComponent} from "./page/lernsets/lernen/lernen.component";
 import {PremiumComponent} from "./page/premium/premium.component";
+import {KaufenComponent as PremiumKaufenComponent} from "./page/premium/kaufen/kaufen.component";
+import {KaufenComponent as PremiumLiteKaufenComponent} from "./page/premium/lite/kaufen/kaufen.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -38,6 +40,8 @@ export const routes: Routes = [
   {path: 'abmelden', component: AbmeldenComponent},
   {path: 'einstellungen', component: EinstellungenComponent},
   {path: 'premium', component: PremiumComponent},
+  {path: 'premium/kaufen', component: PremiumKaufenComponent},
+  {path: 'premium/lite/kaufen', component: PremiumLiteKaufenComponent},
   {path: 'registrieren', component: RegistrierenComponent},
   {path: 'registrieren/weiter', component: WeiterComponent},
   {path: 'registrieren/fertig', component: FertigComponent},

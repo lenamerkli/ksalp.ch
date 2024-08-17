@@ -84,6 +84,14 @@ LANGUAGES = [
     'es',
     '-'
 ]
+PRICES = {
+    'premiumYear': '20.00',
+    'premiumLiteYear': '4.00',
+}
+PRODUCTS = {
+    'premiumYear': 'ksalp.ch Premium 1 Jahr',
+    'premiumLiteYear': 'ksalp.ch Premium Lite 1 Jahr',
+}
 SEARCH_ENGINES = {
     'DuckDuckGo': {
         'url': 'https://duckduckgo.com/?q=%s',

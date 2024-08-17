@@ -1,7 +1,7 @@
 <!--suppress HtmlUnknownTarget -->
 <div class="navbar">
   <p class="mobile mobile-account">
-    <a routerLink="#" (click)="closeMobile.emit()">
+    <a (click)="closeMobile.emit()">
       <mat-icon class="close-icon">close</mat-icon>
     </a>
     @if (account !== null && account.isValid()) {

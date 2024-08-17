@@ -20,6 +20,7 @@ import {MatIcon} from "@angular/material/icon";
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  openNavbar = false;
   public account: Account | null = null;
   constructor(private readonly accountService: AccountService) {
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
@@ -30,6 +31,7 @@ export class AppComponent {
     let navbar = document.getElementById('navbar');
     if(navbar){
       navbar.style.display = 'block';
+      this.openNavbar = true;
     }
     window.scroll({
       top: 0,
@@ -41,6 +43,7 @@ export class AppComponent {
     let navbar = document.getElementById('navbar');
     if(navbar){
       navbar.style.display = '';
+      this.openNavbar = false;
     }
   }
 }

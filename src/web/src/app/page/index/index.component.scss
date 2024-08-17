@@ -67,3 +67,24 @@ mat-card{
   grid-template-columns: repeat(auto-fill, minmax(14em, 1fr));
   grid-gap: 1em;
 }
+.landing{
+  & table{
+    table-layout: fixed;
+  }
+  & td{
+    vertical-align: center;
+    height: 8em;
+  }
+  & .table-large{
+    font-size: 2em;
+    font-weight: bold;
+    width: 24%;
+  }
+  & .table-small{
+    font-size: 1.2em;
+    width: 40%;
+  }
+  & a{
+    margin: 0.2em;
+  }
+}

@@ -8,6 +8,7 @@ import {MatFormField} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatCard, MatCardContent, MatCardImage, MatCardLgImage, MatCardXlImage} from "@angular/material/card";
 import {ConstantService} from "../../service/constant.service";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-index',
@@ -22,7 +23,8 @@ import {ConstantService} from "../../service/constant.service";
     MatCardLgImage,
     RouterLink,
     MatFormField,
-    MatInput
+    MatInput,
+    MatDivider
   ],
   templateUrl: './index.component.html',
   styleUrl: './index.component.scss'

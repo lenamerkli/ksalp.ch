@@ -5,7 +5,7 @@
   </div>
   <div class="header">
     <p>
-      <a routerLink="#" class="link" (click)="open_mobile()"><mat-icon class="menu-icon">menu</mat-icon></a>
+      <a class="link" (click)="open_mobile()"><mat-icon class="menu-icon">menu</mat-icon></a>
       <a routerLink="/">
         <img src="/static/logo.svg" alt="ksalp.ch">
       </a>
@@ -22,9 +22,11 @@
   </div>
   -->
   <div class="container">
-    <div class="router">
-      <router-outlet></router-outlet>
-    </div>
+    @if (!openNavbar){
+      <div class="router">
+        <router-outlet></router-outlet>
+      </div>
+    }
     <div class="footer" ngPreserveWhitespaces>
       <p class="footer-text">
         <span class="footer-inner">Mit &#9825; bereitgestellt vom <a class="footer-link" href="/über/team">ksalp.ch Team</a>&emsp;|&emsp;

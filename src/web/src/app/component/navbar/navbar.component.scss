@@ -24,6 +24,7 @@
   @media (max-width: 42em) {
     width: 100vw;
   }
+  z-index: 1000;
 }
 .navbar-whitespace{
   @media (min-width: calc(42em + 1px)) {

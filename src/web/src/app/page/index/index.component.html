@@ -1,6 +1,6 @@
 <div class="main">
   @if (!(account === null) && !(account.isValid())){
-    <h1>Willkommen auf ksalp.ch</h1>
+    <!-- <h1>Willkommen auf ksalp.ch</h1>
     <p class="center">
       ksalp.ch ist eine Lernplattform für Lernende von Lernenden der Kantonsschule Alpenquai Luzern. Lernende von anderen Gymnasien sind hier auch herzlich willkommen.
       Diese Plattform lebt von den Beiträgen der Nutzenden.
@@ -23,6 +23,37 @@
           <a mat-raised-button color="primary" routerLink="/über/kontakt">Kontakt</a>
         </li>
       </ul>
+    </div> -->
+    <div class="landing" id="container">
+      <mat-divider></mat-divider>
+      <table>
+        <tr>
+          <td class="table-large">ksalp.ch - Lernplattform für Lernende von Lernenden der KSA</td>
+          <td class="table-small"><a mat-raised-button color="primary" routerLink="/anmelden">Anmelden</a><br><a mat-raised-button color="primary" routerLink="/registrieren">Registrieren</a></td>
+        </tr>
+      </table>
+      <mat-divider></mat-divider>
+      <table>
+        <tr>
+          <td class="table-small"><a mat-raised-button color="primary" routerLink="/dokumente">Dokumente</a><br><a mat-raised-button color="primary" routerLink="/dokumente/neu">Dokument hochladen</a></td>
+          <td class="table-large">Einfach Dokumente mit der Klasse und Parallelklassen teilen</td>
+        </tr>
+      </table>
+      <mat-divider></mat-divider>
+      <table>
+        <tr>
+          <td class="table-large">ksalp.ch Lernsets - die Alternative zu Quizlet</td>
+          <td class="table-small"><a mat-raised-button color="primary" routerLink="/lernsets">Lernsets</a><br><a mat-raised-button color="primary" routerLink="/lernsets/neu">Lernset hochladen</a></td>
+        </tr>
+      </table>
+      <mat-divider></mat-divider>
+        <table>
+          <tr>
+            <td class="table-small"><a mat-raised-button color="primary" routerLink="/premium">Premium</a></td>
+            <td class="table-large">Gratis und Werbefrei dank den Premium Abonnenten</td>
+          </tr>
+        </table>
+      <mat-divider></mat-divider>
     </div>
   } @else if (account !== null && account.isValid()) {
     <div class="signin">

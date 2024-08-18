@@ -26,6 +26,7 @@ import {KaufenComponent as PremiumKaufenComponent} from "./page/premium/kaufen/k
 import {KaufenComponent as PremiumLiteKaufenComponent} from "./page/premium/lite/kaufen/kaufen.component";
 import {KontaktComponent} from "./page/ueber/kontakt/kontakt.component";
 import {TeamComponent} from "./page/ueber/team/team.component";
+import {HilfeComponent} from "./page/lernsets/hilfe/hilfe.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -35,6 +36,7 @@ export const routes: Routes = [
   {path: 'dokumente/bearbeiten/:id', component: DokumenteBearbeitenComponent},
   {path: 'lernsets', component: LernsetsComponent},
   {path: 'lernsets/neu', component: LernsetsNeuComponent},
+  {path: 'lernsets/hilfe', component: HilfeComponent},
   {path: 'lernsets/vorschau/:id', component: LernsetsVorschauComponent},
   {path: 'lernsets/bearbeiten/:id', component: LernsetsBearbeitenComponent},
   {path: 'lernsets/lernen/:ids', component: LernenComponent},

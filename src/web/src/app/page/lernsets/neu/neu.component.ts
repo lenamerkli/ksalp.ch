@@ -10,7 +10,7 @@ import {Account} from "../../../type/account";
 import {HttpClient} from "@angular/common/http";
 import {ConstantService} from "../../../service/constant.service";
 import {AccountService} from "../../../service/account.service";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
@@ -27,7 +27,8 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
     MatLabel,
     MatOption,
     MatSelect,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './neu.component.html',
   styleUrl: './neu.component.scss'

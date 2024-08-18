@@ -1,0 +1,43 @@
+<div id="container">
+  <h2>Hilfe zum Erstellen eines Lernsets</h2>
+  <h3>Akzeptierte Dateiformate</h3>
+  <h4>1. Text</h4>
+  <p>Erstellen Sie eine neue Textdatei (Windows: "Editor", macOS: "Textedit", GNU/Linux: "GEdit" oder "nano") mit der Kodierung "UTF-8" (meistens am unteren, rechten Fensterrand erkennbar) und der Endung ".txt". Zuerst wird die Frage eingetragen, danach mit einem Semikolon und einem Leerzeichen getrennt die korrekte Antwort. Pro Zeile gibt es eine Frage.</p>
+  <pre>
+    die Medien; les médias (m.)
+    ein Smartphone; un smartphone
+    auf etw. verzichten; se passer de qc
+  </pre>
+  <p>Für mehrere korrekte Antworten können Sie weitere Semikolon und Leerzeichen verwenden. Die erste Antwort ist dabei die Musterlösung.</p>
+  <pre>
+    ein(e) Jugendliche(r); un(e) ado / un(e) adolescent(e); un(e) ado; un(e) adolescent(e)
+  </pre>
+  <h4>2. JSON</h4>
+  <p>Erstellen Sie eine neue JSON-Datei mit der Software Ihrer Wahl. Nutzen Sie die folgende Struktur:</p>
+  <pre>
+    [
+      &#123;
+        "question": string,
+        "answer": string,
+        "answers": list&lt;string&gt;,
+        "frequency": float,
+        "auto_check": int
+      &#125;
+      &#123;
+        "question": string,
+        "answer": string,
+        "answers": list&lt;string&gt;,
+        "frequency": float,
+        "auto_check": int
+      &#125;
+    ]
+  </pre>
+  <p>Die Felder <code>answers, frequency, auto_check</code> sind optional. Aktuell wird <code>auto_check</code> nicht genutzt.</p>
+  <h4>3. JSONL</h4>
+  <p>Fast gleich wie 2. JSON, aber die Datei enthält pro Zeile ein JSON-Objekt und die Dateiendung <code>.jsonl</code>.</p>
+  <pre>
+    &#123;"question": string, "answer": string, "answers": list&lt;string&gt;, "frequency": float, "auto_check": int&#125;
+    &#123;"question": string, "answer": string, "answers": list&lt;string&gt;, "frequency": float, "auto_check": int&#125;
+  </pre>
+  <p>Die Felder <code>answers, frequency, auto_check</code> sind optional. Aktuell wird <code>auto_check</code> nicht genutzt.</p>
+</div>

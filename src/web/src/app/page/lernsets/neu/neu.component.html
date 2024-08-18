@@ -1,5 +1,6 @@
 <div id="container">
   <h2>Lernset hochladen</h2>
+  <p><a routerLink="/lernsets/hilfe">Hilfe zum Erstellen eines Lernsets</a></p>
   <mat-divider></mat-divider>
   <br>
   <mat-form-field [style.width.em]="24">
@@ -71,6 +72,7 @@
   <button type="button" mat-raised-button color="primary" (click)="fileInput.click()">Datei auswählen</button>
   <input hidden="hidden" type="file" #fileInput (change)="updateFileName($event)">
   <p>{{this.fileName}}</p>
+  <p><a routerLink="/lernsets/hilfe">Hilfe zur Datei</a></p>
   <br>
   <button mat-raised-button color="primary" (click)="submit()">Hochladen</button>
   <br>

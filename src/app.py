@@ -2352,8 +2352,9 @@ def r_api_v1_account_register_continue():
     account_data['hash_'] = urlsafe_b64decode(account_data['hash_'])
     account_data['theme'] = 'light'
     account_data['iframe'] = 1
-    account = User(**account_data)
-    account.save()
+    if not query_db('SELECT id FROM users WHERE mail=?', (account_data['mail'],), True):
+        account = User(**account_data)
+        account.save()
     return {
         'status': 'success',
         'message': 'Account created successfully.'

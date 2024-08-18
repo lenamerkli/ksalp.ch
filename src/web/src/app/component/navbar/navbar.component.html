@@ -15,7 +15,7 @@
       <img src="/static/logo.svg" alt="ksalp.ch">
     </a>
   </p>
-  <mat-accordion [multi]="false" class="mat-accordion">
+  <mat-accordion [multi]="false" class="mat-accordion" (click)="closeMobile.emit()">
     <app-navbar-link link="/">Hauptseite</app-navbar-link>
     <mat-divider></mat-divider>
     <app-navbar-link link="/dokumente">Dokumente</app-navbar-link>

@@ -11,6 +11,8 @@ import {MatInput} from "@angular/material/input";
 import {Router, RouterLink} from "@angular/router";
 import {MatAnchor, MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
+import {MatOption} from "@angular/material/autocomplete";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-lernsets',
@@ -29,7 +31,9 @@ import {MatIcon} from "@angular/material/icon";
     FormsModule,
     MatAnchor,
     MatButton,
-    MatIcon
+    MatIcon,
+    MatOption,
+    MatSelect
   ],
   templateUrl: './lernsets.component.html',
   styleUrl: './lernsets.component.scss'
@@ -140,4 +144,6 @@ export class LernsetsComponent implements OnInit {
     this.formControls[id].setValue(!this.formControls[id].value);
     this.updateSelectionCount();
   }
+
+  protected readonly setTimeout = setTimeout;
 }

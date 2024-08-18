@@ -5,11 +5,12 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {merge} from "rxjs";
 import {FormControl, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatButton} from "@angular/material/button";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {Account, AccountDto} from "../../type/account";
 import {DefaultResponseDto} from "../../type/defaulf-response";
 import {AccountService} from "../../service/account.service";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-anmelden',
@@ -19,6 +20,8 @@ import {AccountService} from "../../service/account.service";
     MatInput,
     ReactiveFormsModule,
     MatButton,
+    MatDivider,
+    RouterLink,
   ],
   templateUrl: './anmelden.component.html',
   styleUrl: './anmelden.component.scss'

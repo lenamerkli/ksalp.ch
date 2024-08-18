@@ -12,43 +12,47 @@
   <div id="inputs">
     <mat-form-field [style.width.em]="16">
       <mat-label>Titel & Beschreibung</mat-label>
-      <input matInput type="text" [formControl]="text" (keyup)="update()">
+      <input placeholder="vocabulaire unité 1" matInput type="text" [formControl]="text" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>Klasse</mat-label>
-      <input matInput type="text" [formControl]="class_" (keyup)="update()">
+      <input placeholder="G21a | SBC-5B" matInput type="text" [formControl]="class_" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>Klassenstufe</mat-label>
-      <input matInput type="text" [formControl]="grade" (keyup)="update()">
+      <mat-select [formControl]="grade" (selectionChange)="update()">
+        @for (grade of ['', '-', '1', '2', '3', '4', '5', '6', '7']; track grade){
+          <mat-option [value]="grade">{{grade}}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>Fach (Kürzel)</mat-label>
-      <input matInput type="text" [formControl]="subject" (keyup)="update()">
+      <input placeholder="FR" matInput type="text" [formControl]="subject" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>Sprache (Kürzel)</mat-label>
-      <input matInput type="text" [formControl]="language_" (keyup)="update()">
+      <input placeholder="fr" matInput type="text" [formControl]="language_" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>Ersteller*in</mat-label>
-      <input matInput type="text" [formControl]="creator" (keyup)="update()">
+      <input placeholder="Name" matInput type="text" [formControl]="creator" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>später erstellt als</mat-label>
-      <input matInput type="text" [formControl]="createdAfter" (keyup)="update()">
+      <input placeholder="2024-08-19" matInput type="text" [formControl]="createdAfter" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>früher erstellt als</mat-label>
-      <input matInput type="text" [formControl]="createdBefore" (keyup)="update()">
+      <input placeholder="2024-08-19" matInput type="text" [formControl]="createdBefore" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>später bearbeitet als</mat-label>
-      <input matInput type="text" [formControl]="editedAfter" (keyup)="update()">
+      <input placeholder="2024-08-19" matInput type="text" [formControl]="editedAfter" (keyup)="update()">
     </mat-form-field>
     <mat-form-field [style.width.em]="16">
       <mat-label>früher bearbeitet als</mat-label>
-      <input matInput type="text" [formControl]="editedBefore" (keyup)="update()">
+      <input placeholder="2024-08-19" matInput type="text" [formControl]="editedBefore" (keyup)="update()">
     </mat-form-field>
   </div>
   <mat-divider></mat-divider>
@@ -71,7 +75,7 @@
             }
             [{{learnset.getSubject().toUpperCase()}}] {{learnset.getTitle()}}
           </mat-card-title>
-          <mat-card-subtitle routerLink="/lernsets/vorschau/{{learnset.getId()}}">[{{learnset.getSize()}} Elemente] {{learnset.getCreated().split('_')[0]}} bis {{learnset.getEdited().split('_')[0]}} von <i>{{learnset.getOwnerName()}}</i></mat-card-subtitle>
+          <mat-card-subtitle>[{{learnset.getSize()}} Elemente] {{learnset.getCreated().split('_')[0]}} bis {{learnset.getEdited().split('_')[0]}} von <i>{{learnset.getOwnerName()}}</i> | <a routerLink="/lernsets/vorschau/{{learnset.getId()}}">Vorschau</a></mat-card-subtitle>
         </mat-card-header>
       </mat-card>
     }

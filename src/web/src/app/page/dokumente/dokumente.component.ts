@@ -9,22 +9,26 @@ import {MatCard, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/ma
 import {RouterLink} from "@angular/router";
 import {Account} from "../../type/account";
 import {AccountService} from "../../service/account.service";
+import {MatOption} from "@angular/material/autocomplete";
+import {MatSelect} from "@angular/material/select";
 
 @Component({
   selector: 'app-dokumente',
   standalone: true,
-  imports: [
-    MatDivider,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    ReactiveFormsModule,
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardSubtitle,
-    RouterLink
-  ],
+    imports: [
+        MatDivider,
+        MatFormField,
+        MatLabel,
+        MatInput,
+        ReactiveFormsModule,
+        MatCard,
+        MatCardHeader,
+        MatCardTitle,
+        MatCardSubtitle,
+        RouterLink,
+        MatOption,
+        MatSelect
+    ],
   templateUrl: './dokumente.component.html',
   styleUrl: './dokumente.component.scss'
 })

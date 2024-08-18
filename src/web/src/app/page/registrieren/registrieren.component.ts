@@ -19,24 +19,26 @@ import {DefaultResponseDto} from "../../type/defaulf-response";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {zxcvbn} from "@zxcvbn-ts/core";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-registrieren',
   standalone: true,
-  imports: [
-    FormsModule,
-    MatButton,
-    MatError,
-    MatFormField,
-    MatInput,
-    MatLabel,
-    ReactiveFormsModule,
-    MatSelect,
-    MatOption,
-    MatCheckbox,
-    RouterLink,
-    MatHint
-  ],
+    imports: [
+        FormsModule,
+        MatButton,
+        MatError,
+        MatFormField,
+        MatInput,
+        MatLabel,
+        ReactiveFormsModule,
+        MatSelect,
+        MatOption,
+        MatCheckbox,
+        RouterLink,
+        MatHint,
+        MatDivider
+    ],
   templateUrl: './registrieren.component.html',
   styleUrl: './registrieren.component.scss'
 })

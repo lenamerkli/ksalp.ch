@@ -31,13 +31,12 @@ import qrbill
 
 from resources import *
 
-
 ########################################################################################################################
 # GENERAL SETUP
 ########################################################################################################################
 
 
-DEVELOPMENT = True
+DEVELOPMENT = False
 
 load_dotenv()
 app = Flask(__name__)
@@ -255,7 +254,8 @@ def send_mail(address: str, subject: str, message_plain: str, message: str) -> t
 def hash_password(password: str, salt: bytes):
     return pbkdf2_hmac(
         hash_name='sha3_512',
-        password=urlsafe_b64decode(environ['HASH_PEPPER_1']) + password.encode() + urlsafe_b64decode(environ['HASH_PEPPER_2']),
+        password=urlsafe_b64decode(environ['HASH_PEPPER_1']) + password.encode() + urlsafe_b64decode(
+            environ['HASH_PEPPER_2']),
         salt=salt,
         iterations=int(environ['HASH_ITERATIONS']),
     )
@@ -467,23 +467,23 @@ class User:
         else:
             query_db('UPDATE users SET name=?, mail=?, salt=?, hash=?, newsletter=?, created=?, theme=?, iframe=?, '
                      'payment=?, payment_lite=?, banned=?, search=?, class=?, grade=?, favorites=? WHERE id=?', (
-                self._name,
-                self._mail,
-                self._salt,
-                self._hash,
-                self._newsletter,
-                self._created,
-                self._theme,
-                self._iframe,
-                self._payment,
-                self._payment_lite,
-                self._banned,
-                self._search,
-                self._classes,
-                self._grade,
-                self._favorites,
-                self._id
-            ))
+                         self._name,
+                         self._mail,
+                         self._salt,
+                         self._hash,
+                         self._newsletter,
+                         self._created,
+                         self._theme,
+                         self._iframe,
+                         self._payment,
+                         self._payment_lite,
+                         self._banned,
+                         self._search,
+                         self._classes,
+                         self._grade,
+                         self._favorites,
+                         self._id
+                     ))
 
     @staticmethod
     def load(user_id):
@@ -790,7 +790,8 @@ class Comment:
 class Document:
 
     def __init__(self, id_: str = None, title: str = '', subject: str = '-', description: str = '', class_: str = '',
-                 grade: str = '-', language: str = '-', owner: str = '', edited: datetime = None, created: datetime = None,
+                 grade: str = '-', language: str = '-', owner: str = '', edited: datetime = None,
+                 created: datetime = None,
                  extension: str = '', mimetype: str = '', size: int = 0) -> None:
         self._id = ''
         self._title = ''
@@ -827,7 +828,7 @@ class Document:
 
     def __str__(self) -> str:
         return f"Document #{self._id}"
-    
+
     def __dict__(self) -> dict:
         return {
             'id_': self.id_,
@@ -871,22 +872,23 @@ class Document:
                 self._size,
             ))
         else:
-            query_db('UPDATE documents SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, edited=?, '
-                     'created=?, extension=?, mimetype=?, size=? WHERE id=?', (
-                         self._title,
-                         self._subject,
-                         self._description,
-                         self._class,
-                         self._grade,
-                         self._language,
-                         self._owner,
-                         self._edited,
-                         self._created,
-                         self._extension,
-                         self._mimetype,
-                         self._size,
-                         self._id,
-                     ))
+            query_db(
+                'UPDATE documents SET title=?, subject=?, description=?, class=?, grade=?, language=?, owner=?, edited=?, '
+                'created=?, extension=?, mimetype=?, size=? WHERE id=?', (
+                    self._title,
+                    self._subject,
+                    self._description,
+                    self._class,
+                    self._grade,
+                    self._language,
+                    self._owner,
+                    self._edited,
+                    self._created,
+                    self._extension,
+                    self._mimetype,
+                    self._size,
+                    self._id,
+                ))
 
     @staticmethod
     def load(document_id):
@@ -1939,15 +1941,15 @@ class CalendarEvent:
         else:
             query_db('UPDATE calendar_events SET calendar=?, title=?, description=?, start=?, end=?, color=?,'
                      ' schulnetz=? WHERE id=?', (
-                self._calendar,
-                self._title,
-                self._description,
-                self._start,
-                self._end,
-                self._color,
-                self._schulnetz,
-                self._id,
-            ))
+                         self._calendar,
+                         self._title,
+                         self._description,
+                         self._start,
+                         self._end,
+                         self._color,
+                         self._schulnetz,
+                         self._id,
+                     ))
 
     @staticmethod
     def load(calendar_event_id):
@@ -2053,6 +2055,7 @@ def login_required(func):
             if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
                 return func(*args, **kwargs)
         return r
+
     wrapper.__name__ = func.__name__
     return wrapper
 
@@ -2072,6 +2075,7 @@ def premium_required(func):
             if user.valid_payment():
                 return func(*args, **kwargs)
         return r
+
     wrapper.__name__ = func.__name__
     return wrapper
 
@@ -2091,6 +2095,7 @@ def premium_lite_required(func):
             if user.valid_payment() or user.valid_payment_lite():
                 return func(*args, **kwargs)
         return r
+
     wrapper.__name__ = func.__name__
     return wrapper
 
@@ -2122,7 +2127,7 @@ def r_dateien_dokumente(id_: str, name: str):
         return 'Datei konnte nicht gefunden werden', 404
     if not result:
         return 'Datei konnte nicht gefunden werden', 404
-    resp = make_response(send_from_directory(join(app.root_path, 'files'), id_))
+    resp = make_response(send_from_directory(join(app.root_path, 'files'), f"{id_}.{result.extension}"))
     resp.headers['Content-Disposition'] = f"inline; filename={name}"
     resp.mimetype = result.mimetype
     return resp
@@ -2138,6 +2143,7 @@ def r_dateien_lernsets(id_: str, name: str):
     resp.headers['Content-Disposition'] = f"inline; filename={name}"
     resp.mimetype = 'application/json'
     return resp
+
 
 @app.route('/api/v1/account', methods=['GET'])
 def r_api_v1_account():
@@ -2288,19 +2294,20 @@ def r_api_v1_account_register():
             'message': 'An account with this email address already exists.',
         }, 400
     salt = rand_salt()
-    account = {'name': data['name'], 'classes': data['class_'].split(' '), 'grade': data['grade'], 'mail': data['email'],
+    account = {'name': data['name'], 'classes': data['class_'].split(' '), 'grade': data['grade'],
+               'mail': data['email'],
                'newsletter': data['newsletter'], 'salt': salt,
                'hash_': urlsafe_b64encode(hash_password(data['password'], urlsafe_b64decode(salt))).decode()}
     mail = MailCheck(account=account, valid=datetime.now() + timedelta(minutes=15))
     mail.save()
     mail_plain = f"""Guten Tag, {data['name']}
-    
+
     Um die Registrierung bei ksalp.ch abzuschliessen, klicken Sie bitte auf den folgenden Link:
-    
+
     https://ksalp.ch/registrieren/mail/{mail.code}
-    
+
     Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.
-    
+
     Das ksalp.ch Team wünscht Ihnen viel Erfolg beim Lernen.
     """
     mail_html = f"""<p>Guten Tag, {data['name']}</p>
@@ -2309,7 +2316,8 @@ def r_api_v1_account_register():
     <p>Der Link ist für 15 Minuten gültig. Falls Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.</p>
     <p>Das ksalp.ch Team wünscht Ihnen viel Erfolg beim Lernen.</p>
     """
-    result = send_mail(address=data['email'], subject='Registrierung bei ksalp.ch', message_plain=mail_plain, message=mail_html)
+    result = send_mail(address=data['email'], subject='Registrierung bei ksalp.ch', message_plain=mail_plain,
+                       message=mail_html)
     if result is not None:
         return {
             'error': 'exception during email delivery',
@@ -2352,9 +2360,8 @@ def r_api_v1_account_register_continue():
     account_data['hash_'] = urlsafe_b64decode(account_data['hash_'])
     account_data['theme'] = 'light'
     account_data['iframe'] = 1
-    if not query_db('SELECT id FROM users WHERE mail=?', (account_data['mail'],), True):
-        account = User(**account_data)
-        account.save()
+    account = User(**account_data)
+    account.save()
     return {
         'status': 'success',
         'message': 'Account created successfully.'
@@ -3117,9 +3124,9 @@ def r_api_v1_calendars_selection_update():
     }
 
 
-if DEVELOPMENT:
-    @app.errorhandler(404)
-    def error_handler_404(*_, **__):
+@app.errorhandler(404)
+def error_handler_404(*_, **__):
+    if DEVELOPMENT:
         res = requests_send(
             method=request.method,
             url='http://' + request.url.replace(request.host_url, f'localhost:4200/'),  # noqa
@@ -3136,14 +3143,14 @@ if DEVELOPMENT:
         ]
         response = Response(res.content, res.status_code, headers)  # noqa
         return response
-else:
-    @app.route('/', defaults={'path': ''}, methods=['GET'])
-    @app.route('/<path:path>', methods=['GET'])
-    def angular_serve(path: str):
+    else:
+        path = request.path
+        if path and path.startswith('/'):
+            path = path[1:]
         if path != '' and exists(relative_path(join('build', path))):
-            return send_from_directory(relative_path('build'), path)
+            return send_from_directory(relative_path('build'), path), 200
         else:
-            return send_from_directory(relative_path('build'), 'index.html')
+            return send_from_directory(relative_path('build'), 'index.html'), 200
 
 
 if __name__ == '__main__':

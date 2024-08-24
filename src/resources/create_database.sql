@@ -104,3 +104,8 @@ CREATE TABLE IF NOT EXISTS used_ids (
     id TEXT PRIMARY KEY,
     created TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS ips (
+    ip TEXT PRIMARY KEY,
+    score INTEGER NOT NULL,
+    description TEXT NOT NULL
+);

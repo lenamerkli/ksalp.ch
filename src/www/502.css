@@ -1,30 +1,8 @@
 body{
-    font-family: "Montserrat", "Segoe UI", SegoeUI, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Segoe UI, SegoeUI, Helvetica Neue, Helvetica, Arial, sans-serif;
     padding: 0;
     margin: 0;
-}
-@font-face {
-    font-family: "Montserrat";
-    font-style: normal;
-    src: url("/error_www/fonts/Montserrat-Medium.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Montserrat";
-    font-style: italic;
-    src: url("/error_www/fonts/Montserrat-MediumItalic.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Montserrat Bold";
-    font-style: normal;
-    src: url("/error_www/fonts/Montserrat-Bold.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Montserrat Bold";
-    font-style: italic;
-    src: url("/error_www/fonts/Montserrat-BoldItalic.ttf") format("truetype");
-}
-b, h1, h2, h3, h4, h5, h6{
-    font-family: "Montserrat Bold", "Segoe UI", SegoeUI, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex;
 }
 .main{
     position: absolute;
@@ -35,6 +13,19 @@ b, h1, h2, h3, h4, h5, h6{
     transform: translateX(-50%) translateY(-50%);
     text-align: center;
 }
-img{
-    height: 3em;
+.header1{
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+}
+.header2{
+    font-size: 4em;
+    margin: 0;
+    padding: 0;
+}
+.header3{
+    font-size: 1.2em;
+    text-align: justify;
+    -moz-text-align-last: center;
+    text-align-last: center;
 }

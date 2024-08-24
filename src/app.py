@@ -10,8 +10,9 @@ from datetime import timedelta, datetime
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import Flask, g, session, request, Response, send_from_directory, make_response
-from hashlib import pbkdf2_hmac
+from flask import Flask, g, session, request, Response, send_from_directory, make_response, render_template
+from hashlib import pbkdf2_hmac, sha3_512
+from ipaddress import ip_address, IPv4Address, IPv6Address
 from json import loads, dumps
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
 from logging import INFO as LOG_INFO, log as logging_log, ERROR as LOG_ERROR
@@ -36,7 +37,7 @@ from resources import *
 ########################################################################################################################
 
 
-DEVELOPMENT = False
+DEVELOPMENT = environ.get('ENVIRONMENT', '') == 'dev'
 
 load_dotenv()
 app = Flask(__name__)
@@ -261,6 +262,21 @@ def hash_password(password: str, salt: bytes):
     )
 
 
+def hash_ip(ip):
+    try:
+        ip_obj = ip_address(ip)
+        if isinstance(ip_obj, IPv4Address):
+            hashed = sha3_512(ip_obj.packed).digest()
+        elif isinstance(ip_obj, IPv6Address):
+            hashed = sha3_512(ip_obj.packed).digest()
+        else:
+            raise ValueError("Invalid IP address")
+    except ValueError:
+        raise ValueError("Invalid IP address")
+
+    return urlsafe_b64encode(hashed).decode()
+
+
 def extract_browser(agent):
     return f"{agent.platform}-{agent.browser}"
 
@@ -322,6 +338,42 @@ def import_learnset(file: str, seperator: str = '; ') -> list[dict]:
                                   'frequency': 1.0, 'auto_check': 1}
                 output.append(parsed_element)
     return output
+
+
+########################################################################################################################
+# SECURITY
+########################################################################################################################
+
+
+def is_signed_in():
+    if 'account' in session:
+        try:
+            login = Login.load(session['account'])
+        except Exception as error:
+            logging_log(LOG_ERROR, error)
+            return False
+        if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
+            return True
+    return False
+
+
+def scan_request():
+    ip = request.access_route[-1]
+    user_agent = request.user_agent.string
+    path = repr(request.full_path)[1:-1]
+    score = query_db('SELECT score, ip FROM ips WHERE ip = ?', (ip,), True)
+    if not score:
+        score = 2
+        query_db('INSERT INTO ips VALUES (?, ?, ?)', (ip, 2, 'unknown'))
+    else:
+        score = score[0]
+    before = score
+
+    if before != score:
+        query_db('UPDATE ips SET score = ? WHERE ip = ?', (score, ip))
+
+    access_log.info(f'{hash_ip(ip)}\t{score}\t{int(is_signed_in())}\t{request.method}\t{path}\t{user_agent}')
+    return score
 
 
 ########################################################################################################################
@@ -2046,14 +2098,8 @@ class CalendarEvent:
 def login_required(func):
     def wrapper(*args, **kwargs):
         r = {'error': 'account required'}, 401
-        if 'account' in session:
-            try:
-                login = Login.load(session['account'])
-            except Exception as error:
-                logging_log(LOG_ERROR, error)
-                return r
-            if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
-                return func(*args, **kwargs)
+        if is_signed_in():
+            return func(*args, **kwargs)
         return r
 
     wrapper.__name__ = func.__name__
@@ -2109,6 +2155,9 @@ def premium_lite_required(func):
 def before_request():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(days=92)
+    score = scan_request()
+    if score == 0:
+        return render_template('_banned.html', ip=request.access_route[-1]), 403
 
 
 @app.route('/static/<path:file>', methods=['GET'])
@@ -2242,7 +2291,8 @@ def r_api_v1_account_signin():
         if not user_id:
             raise KeyError
         user = User.load(user_id)
-    except KeyError:
+    except (KeyError, TypeError) as error:
+        logging_log(LOG_ERROR, error)
         return {
             'error': 'sign-in failed',
             'message': 'The combination of password and email does not exist.'

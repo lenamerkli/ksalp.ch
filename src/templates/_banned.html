@@ -2,7 +2,7 @@
 <html lang="de-CH">
 <head>
     <meta charset="UTF-8">
-    <title>Wartungsarbeiten</title>
+    <title>IP-Adresse gesperrt | IP-address blocked - [ksalp.ch]</title>
     <link rel="stylesheet" href="/error_www/502.css">
     <link rel="apple-touch-icon" sizes="60x60" href="/error_www/favicons/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="76x76" href="/error_www/favicons/apple-touch-icon-76x76.png">
@@ -22,9 +22,21 @@
 <body>
 <div class="main">
     <h1><img src="/error_www/logo.svg" alt="ksalp.ch"></h1>
-    <h1 class="header2">Wartungsarbeiten</h1>
-    <p class="header3">Die Webseite <i>ksalp.ch</i> ist zurzeit leider nicht verfügbar, da Wartungsarbeiten vorgenommen werden. Bitte versuchen Sie es später erneut. Für absehbare Ausfallzeiten, welche länger andauern, erhalten alle Nutzer*innen, welche Benachrichtigungen per E-Mail erlauben, frühzeitig eine Mitteilung.</p>
-    <p class="header3">Das ksalp.ch-Team dankt Ihnen für Ihre Geduld und freut sich über Ihren Besuch.</p>
+    <div class="deutsch" lang="de-CH">
+        <h3>Deutsch</h3>
+        <p>Der Zugriff auf diese Webseite (ksalp.ch) von Ihrer IP-Adresse wurde gesperrt. Dies kann mehrere Gründe haben,
+            unter anderem eine Einschätzung unserer automatisierten Überwachungssysteme oder eine manuelle Überprüfung der
+            Log-Dateien. Falls Sie denken, dass es sich bei dieser Sperrung um einen Fehler handelt, kontaktieren Sie bitte
+            den*die Betreiber*in.</p>
+        <p>Ihre IP-Adresse lautet: {{ ip }}</p>
+    </div>
+    <div class="english" lang="en">
+        <h3>English</h3>
+        <p>Access to this website (ksalp.ch) from your IP address has been blocked. This may be due to several reasons,
+            including an assessment of our automated monitoring systems or a manual review of the log files. If you think
+            that this blocking is a mistake, please contact the operator.</p>
+        <p>Your IP-address is: {{ ip }}</p>
+    </div>
 </div>
 </body>
 </html>

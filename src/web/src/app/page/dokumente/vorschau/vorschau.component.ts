@@ -28,6 +28,26 @@ export class VorschauComponent{
 
   account: Account | null = null;
 
+  previewAvailable: boolean = false;
+  mimetypePreviews: string[] = [
+    'application/json',
+    'application/pdf',
+    'application/rtf',
+    'application/xml',
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+    'image/svg+xml',
+    'image/tiff',
+    'image/webp',
+    'image/x-icon',
+    'text/csv',
+    'text/plain',
+    'video/mp4',
+    'video/mpeg',
+    'video/webm',
+  ]
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private httpClient: HttpClient,
@@ -45,6 +65,7 @@ export class VorschauComponent{
               let url = '/dateien/dokumente/' + this.documentId + '/' + filename;
               this.documentUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(url);
               this.documentUrlFrame = this.domSanitizer.bypassSecurityTrustResourceUrl(url + '#view=FitH');
+              this.previewAvailable = this.mimetypePreviews.includes(this.document.getMimetype());
             } else {
               alert(value.message);
             }

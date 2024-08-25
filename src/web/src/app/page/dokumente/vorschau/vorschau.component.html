@@ -22,8 +22,16 @@
       }
     </p>
     <mat-divider></mat-divider>
-    @if (account === null || !account.isValid() || (account.isValid() && account.getIframe())) {
+    <br>
+    @if (previewAvailable && (account === null || !account.isValid() || (account.isValid() && account.getIframe()))) {
       <iframe [src]="documentUrlFrame"></iframe>
+    } @else if (!previewAvailable) {
+      <p>Die Vorschau ist für dieses Dokument nicht verfügbar. Sie können das Dokument immer noch herunterladen.</p>
     }
+    <br>
+    <br>
+    <mat-divider></mat-divider>
+    <h3>Beschreibung</h3>
+    <p><i>{{ document.getDescription() }}</i></p>
   }
 </div>

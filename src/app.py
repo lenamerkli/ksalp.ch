@@ -15,7 +15,7 @@ from hashlib import pbkdf2_hmac, sha3_512
 from ipaddress import ip_address, IPv4Address, IPv6Address
 from json import loads, dumps
 from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
-from logging import INFO as LOG_INFO, log as logging_log, ERROR as LOG_ERROR
+from logging import INFO as LOG_INFO, exception as log_exception
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
 from os import urandom, environ, listdir
 from os.path import join, exists, dirname, getsize
@@ -83,11 +83,9 @@ def setup_logger(name, file):
     formatter = LogFormatter('%(asctime)s\t%(message)s', datefmt='%Y-%m-%d_%H-%M-%S')
     file_handler = LogFileHandler(file, mode='a')
     file_handler.setFormatter(formatter)
-    stream_handler = LogStreamHandler()
-    stream_handler.setFormatter(formatter)
     logger.setLevel(LOG_INFO)
     logger.addHandler(file_handler)
-    logger.addHandler(stream_handler)
+    logger.propagate = False
 
 
 log_basicConfig(filename='main.log', format='%(asctime)s\t%(message)s', datefmt=DATE_FORMAT, level=LOG_INFO)
@@ -239,9 +237,9 @@ def send_mail(address: str, subject: str, message_plain: str, message: str) -> t
         server.starttls(context=context)
         server.login(sender_email, environ['SMTP_PASSWORD'])
         server.sendmail(sender_email, address, m.as_string())
-    except Exception as error_:
-        logging_log(LOG_ERROR, error_)
-        return error_
+    except Exception as error:
+        log_exception('An error occurred while sending e-mail')
+        return error
     finally:
         server.quit()
     return None
@@ -350,7 +348,7 @@ def is_signed_in():
         try:
             login = Login.load(session['account'])
         except Exception as error:
-            logging_log(LOG_ERROR, error)
+            log_exception('An error occurred while loading the account data' + 0 * str(error))
             return False
         if login.valid > datetime.now() and extract_browser(request.user_agent) == login.browser:
             return True
@@ -372,7 +370,50 @@ def scan_request():
     if before != score:
         query_db('UPDATE ips SET score = ? WHERE ip = ?', (score, ip))
 
-    access_log.info(f'{hash_ip(ip)}\t{score}\t{int(is_signed_in())}\t{request.method}\t{path}\t{user_agent}')
+    headers = dict(request.headers)
+    headers_to_remove = []
+    for key in headers:
+        if key not in ['Host', 'Accept', 'Accept-Language', 'Accept-Encoding']:
+            headers_to_remove.append(key)
+    for key in headers_to_remove:
+        try:
+            del headers[key]
+        except KeyError:
+            pass
+    headers = repr(str(headers))[1:-1]
+    user_agent = repr(user_agent)[1:-1]
+    content_length = request.content_length if request.content_length else 0
+
+    if content_length > pow(2, 10 * 3) * 2:
+        raise OverflowError('Content too large')
+
+    if 0 < content_length <= 1024:
+        content = request.get_data()
+        if isinstance(content, bytes):
+            content = content.decode()
+    elif content_length > 1024:
+        hash_obj = sha3_512()
+        while True:
+            chunk = request.stream.read(pow(2, 10 * 2))
+            if not chunk:
+                break
+            hash_obj.update(chunk)
+        content = f"sha3_512:{urlsafe_b64encode(hash_obj.digest()).decode()}"
+    else:
+        content = ''
+
+    passwords = []
+    if request.is_json:
+        data = request.json
+        for key in ['password', 'oldPassword', 'newPassword']:
+            if key in data:
+                if isinstance(data[key], str) and len(data[key]) > 4:
+                    passwords.append(data[key])
+    for password in passwords:
+        content = content.replace(password, '\\PASSWORD\\')
+
+    access_log.info(f"{hash_ip(ip)}\t{score}\t{int(is_signed_in())}\t{request.method}\t{path}\t{user_agent}\t"
+                    f"{headers}\t{content_length}\t{content}")
     return score
 
 
@@ -2116,7 +2157,7 @@ def premium_required(func):
             try:
                 user: User = Login.load(session['account']).get_account()
             except Exception as error:
-                logging_log(LOG_ERROR, error)
+                log_exception('An error occurred while loading the account data' + 0 * str(error))
                 return r
             if user.valid_payment():
                 return func(*args, **kwargs)
@@ -2136,7 +2177,7 @@ def premium_lite_required(func):
             try:
                 user: User = Login.load(session['account']).get_account()
             except Exception as error:
-                logging_log(LOG_ERROR, error)
+                log_exception('An error occurred while loading the account data' + 0 * str(error))
                 return r
             if user.valid_payment() or user.valid_payment_lite():
                 return func(*args, **kwargs)
@@ -2172,10 +2213,10 @@ def r_dateien_dokumente(id_: str, name: str):
     try:
         result = Document.load(id_)
     except Exception as error:
-        logging_log(LOG_ERROR, error)
-        return 'Datei konnte nicht gefunden werden', 404
+        log_exception('The requested document could not be retrieved' + 0 * str(error))
+        return 'Dokument konnte nicht gefunden werden', 404
     if not result:
-        return 'Datei konnte nicht gefunden werden', 404
+        return 'Dokument konnte nicht gefunden werden', 404
     resp = make_response(send_from_directory(join(app.root_path, 'files'), f"{id_}.{result.extension}"))
     resp.headers['Content-Disposition'] = f"inline; filename={name}"
     resp.mimetype = result.mimetype
@@ -2205,7 +2246,7 @@ def r_api_v1_account():
             paid_lite = user.valid_payment_lite()
             r = {'valid': True, 'paid': paid, 'paidLite': paid_lite, 'info': user.json}
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the account data' + 0 * str(error))
     return r
 
 
@@ -2292,7 +2333,7 @@ def r_api_v1_account_signin():
             raise KeyError
         user = User.load(user_id)
     except (KeyError, TypeError) as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('Email does not exist in users' + 0 * str(error))
         return {
             'error': 'sign-in failed',
             'message': 'The combination of password and email does not exist.'
@@ -2423,7 +2464,7 @@ def r_api_v1_account_logout():
     try:
         login = Login.load(session['account'])
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the account data' + 0 * str(error))
         return {
             'error': 'invalid account login',
             'message': 'The account login could not be found.',
@@ -2777,7 +2818,7 @@ def r_api_v1_documents_edit_form():
     try:
         document = Document.load(form['id'])
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the requested document' + 0 * str(error))
         return {
             'error': 'document not found',
             'message': 'The requested document could not be found.',
@@ -2812,7 +2853,7 @@ def r_api_v1_documents_data(document_id):
     try:
         document = Document.load(document_id).__dict__()
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the requested document' + 0 * str(error))
         return {
             'error': 'document not found',
             'message': 'The requested document could not be found.',
@@ -2871,8 +2912,8 @@ def r_api_v1_learnsets_new_form():
     file_stream.close()
     try:
         learnset_contents = import_learnset(file_contents)
-    except Exception as e:
-        logging_log(LOG_ERROR, e)
+    except Exception as error:
+        log_exception('An error occurred while importing the learnset contents' + 0 * str(error))
         return {
             'error': 'invalid file',
             'message': 'An error occurred while parsing the file.',
@@ -2938,7 +2979,7 @@ def r_api_v1_learnsets_edit_form():
     try:
         learnset = LearnSet.load(form['id'])
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the requested learnset' + 0 * str(error))
         return {
             'error': 'learnset not found',
             'message': 'The requested learnset could not be found.',
@@ -2953,8 +2994,8 @@ def r_api_v1_learnsets_edit_form():
     file_stream.close()
     try:
         learnset_contents = import_learnset(file_contents)
-    except Exception as e:
-        logging_log(LOG_ERROR, e)
+    except Exception as error:
+        log_exception('An error occurred while importing the learnset contents' + 0 * str(error))
         return {
             'error': 'invalid file',
             'message': 'An error occurred while parsing the file.',
@@ -3000,7 +3041,7 @@ def r_api_v1_learnsets_edit_form():
         try:
             query_db('DELETE FROM learn_exercises WHERE id=? AND set_id=?', (element, learnset.id_))
         except Exception as error:
-            logging_log(LOG_ERROR, error)
+            log_exception('An error occurred while updating the learnset exercises' + 0 * str(error))
     return {
         'status': 'success',
         'message': 'Learnset edited successfully.',
@@ -3012,7 +3053,7 @@ def r_api_v1_learnsets_data(learnset_id):
     try:
         learnset = LearnSet.load(learnset_id).__dict__()
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the requested learnset' + 0 * str(error))
         return {
             'error': 'learnset not found',
             'message': 'The requested learnset could not be found.',
@@ -3042,7 +3083,7 @@ def r_api_v1_learnsets_bulk(learnset_ids):
             learnset['edited'] = learnset['edited'].strftime(DATE_FORMAT)
             learnsets.append(learnset)
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the requested learnsets' + 0 * str(error))
         return {
             'error': 'learnsets not found',
             'message': 'The requested learnsets could not be found.',
@@ -3064,7 +3105,7 @@ def r_api_v1_learnsets_bulk(learnset_ids):
         except KeyError:
             pass
     except Exception as error:
-        logging_log(LOG_ERROR, error)
+        log_exception('An error occurred while loading the learnset statistics' + 0 * str(error))
     return {
         'status': 'success',
         'message': 'learnsets retrieved successfully.',
@@ -3120,14 +3161,14 @@ def r_api_v1_calendars_list():
         try:
             calendars.append(Calendar.load(element[0]).__dict__())
         except Exception as error:
-            logging_log(LOG_ERROR, error)
+            log_exception('An error occurred while loading the requested calendar' + 0 * str(error))
     events = []
     for calendar in calendars:
         for event in query_db('SELECT id FROM calendar_events WHERE calendar=?', (calendar['id_'],)):
             try:
                 events.append(CalendarEvent.load(event[0]).__dict__())
             except Exception as error:
-                logging_log(LOG_ERROR, error)
+                log_exception('An error occurred while loading the requested calendar' + 0 * str(error))
     return {
         'status': 'success',
         'message': 'Calendar events have been retrieved.',

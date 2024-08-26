@@ -216,7 +216,7 @@ export class LernenComponent implements OnInit {
     }
     if (this.account !== null && this.account?.isValid()) {
       this.httpClient.post<DefaultResponseDto>('/api/v1/learnsets/answer/' + this.current,
-        JSON.stringify({answer: input, value: value})
+        JSON.stringify({answer: input, value: value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: (value) => {
           if (value.status !== 'success') {

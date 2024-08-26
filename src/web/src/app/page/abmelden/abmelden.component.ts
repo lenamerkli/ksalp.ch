@@ -22,7 +22,7 @@ export class AbmeldenComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.httpClient.post<DefaultResponseDto>('/api/v1/account/logout', JSON.stringify({})).subscribe({
+    this.httpClient.post<DefaultResponseDto>('/api/v1/account/logout', JSON.stringify({}), {headers: {'Content-Type': 'application/json'}}).subscribe({
       next: response => {
         if (response.status && response.status === 'success') {
           this.accountService.getAccountInfo().next(new Account({valid: false, paid: false, paidLite: false, info: null}));

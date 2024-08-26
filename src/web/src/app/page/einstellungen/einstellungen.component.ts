@@ -278,7 +278,7 @@ export class EinstellungenComponent implements OnInit{
 
   sendIframe(value: boolean): void {
     this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/iframe',
-      JSON.stringify({iframe: value})
+      JSON.stringify({iframe: value}), {headers: {'Content-Type': 'application/json'}}
     ).subscribe({
       next: response => {
         if (response.status && response.status === 'success') {
@@ -301,7 +301,7 @@ export class EinstellungenComponent implements OnInit{
 
   sendNewsletter(value: boolean): void {
     this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/newsletter',
-      JSON.stringify({newsletter: value})
+      JSON.stringify({newsletter: value}), {headers: {'Content-Type': 'application/json'}}
     ).subscribe({
       next: response => {
         if (response.status && response.status === 'success') {
@@ -325,7 +325,7 @@ export class EinstellungenComponent implements OnInit{
   submitClass(): void {
     if (!this.class_.invalid){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/class_',
-        JSON.stringify({class_: this.class_.value})
+        JSON.stringify({class_: this.class_.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
@@ -350,7 +350,7 @@ export class EinstellungenComponent implements OnInit{
   submitGrade(): void {
     if (!this.grade.invalid){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/grade',
-        JSON.stringify({grade: this.grade.value})
+        JSON.stringify({grade: this.grade.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
@@ -375,7 +375,7 @@ export class EinstellungenComponent implements OnInit{
   submitSearchEngine(): void {
     if (!this.searchEngine.invalid){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/search',
-        JSON.stringify({search: this.searchEngine.value})
+        JSON.stringify({search: this.searchEngine.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
@@ -404,7 +404,7 @@ export class EinstellungenComponent implements OnInit{
       !this.passwordRepeat.invalid
     ){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/password',
-        JSON.stringify({oldPassword: this.oldPassword.value, password: this.password.value})
+        JSON.stringify({oldPassword: this.oldPassword.value, password: this.password.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
@@ -442,7 +442,7 @@ export class EinstellungenComponent implements OnInit{
   submitFavoriteWebsites(): void {
     if (!this.favoriteWebsites.invalid){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/favorites',
-        JSON.stringify({favorites: this.favoriteWebsites.value})
+        JSON.stringify({favorites: this.favoriteWebsites.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
@@ -467,7 +467,7 @@ export class EinstellungenComponent implements OnInit{
   submitTheme(): void {
     if (!this.theme.invalid){
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/settings/theme',
-        JSON.stringify({theme: this.theme.value})
+        JSON.stringify({theme: this.theme.value}), {headers: {'Content-Type': 'application/json'}}
       ).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {

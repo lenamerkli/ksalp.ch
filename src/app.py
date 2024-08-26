@@ -373,7 +373,7 @@ def scan_request():
     headers = dict(request.headers)
     headers_to_remove = []
     for key in headers:
-        if key not in ['Host', 'Accept', 'Accept-Language', 'Accept-Encoding']:
+        if key not in ['Host', 'Accept', 'Accept-Language', 'Accept-Encoding', 'Content-Type']:
             headers_to_remove.append(key)
     for key in headers_to_remove:
         try:

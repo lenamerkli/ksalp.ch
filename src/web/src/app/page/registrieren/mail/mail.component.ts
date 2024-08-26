@@ -24,7 +24,7 @@ export class MailComponent implements OnInit {
       this.mail_code = value['mail_code'];
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/register/continue', JSON.stringify({
         code: this.mail_code,
-      })).subscribe({
+      }), {headers: {'Content-Type': 'application/json'}}).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
             this.router.navigate(['/registrieren/fertig']).then();

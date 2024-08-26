@@ -68,7 +68,7 @@ export class AnmeldenComponent {
       this.httpClient.post<DefaultResponseDto>('/api/v1/account/signin', JSON.stringify({
         email: this.email.value,
         password: this.password.value
-      })).subscribe({
+      }), {headers: {'Content-Type': 'application/json'}}).subscribe({
           next: response => {
             if (response.status && response.status === 'success') {
               this.accountService.update();

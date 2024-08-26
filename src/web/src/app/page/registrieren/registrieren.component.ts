@@ -252,7 +252,7 @@ export class RegistrierenComponent {
         email: this.email.value,
         password: this.password.value,
         newsletter: this.newsletter.checked,
-      })).subscribe({
+      }), {headers: {'Content-Type': 'application/json'}}).subscribe({
         next: response => {
           if (response.status && response.status === 'success') {
             this.router.navigate(['/registrieren/weiter']).then();

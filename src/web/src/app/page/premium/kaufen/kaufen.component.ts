@@ -3,6 +3,7 @@ import {Account} from "../../../type/account";
 import {AccountService} from "../../../service/account.service";
 import {MatAnchor} from "@angular/material/button";
 import {RouterLink} from "@angular/router";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-kaufen',
@@ -19,7 +20,9 @@ export class KaufenComponent {
 
   constructor(
     private readonly accountService: AccountService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Premium Kaufen - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe(account => {
       this.account = account;
     });

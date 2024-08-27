@@ -13,6 +13,7 @@ import {MatAnchor, MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-lernsets',
@@ -63,7 +64,9 @@ export class LernsetsComponent implements OnInit {
     private httpClient: HttpClient,
     private accountService: AccountService,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Lernsets - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
       this.account = value;
     })

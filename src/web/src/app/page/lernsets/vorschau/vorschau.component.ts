@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {LearnSet, LearnSetDto} from "../../../type/learnset";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {DomSanitizer, SafeUrl, Title} from "@angular/platform-browser";
 import {Account} from "../../../type/account";
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
@@ -39,7 +39,9 @@ export class VorschauComponent {
     private httpClient: HttpClient,
     private accountService: AccountService,
     private domSanitizer: DomSanitizer,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Lernset Vorschau - [ksalp.ch]');
     this.activatedRoute.params.subscribe({
       next: (params) => {
         this.learnsetId = params['id'];
@@ -53,6 +55,7 @@ export class VorschauComponent {
               for(let exercise of value.exercises) {
                 this.exercises.push(new LearnsetExercise(exercise));
               }
+              this.titleService.setTitle('Lernset `[' + this.learnset.getSubject().toUpperCase() + '] ' + this.learnset.getTitle() + '` - [ksalp.ch]');
             } else {
               alert(value.message);
             }

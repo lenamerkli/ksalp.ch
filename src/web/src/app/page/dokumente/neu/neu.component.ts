@@ -12,6 +12,7 @@ import {MatButton} from "@angular/material/button";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {Router} from "@angular/router";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-neu',
@@ -77,7 +78,9 @@ export class NeuComponent {
     private constantService: ConstantService,
     private accountService: AccountService,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Dokument hochladen - [ksalp.ch]');
     this.constantService.getGrades().subscribe((value: string[]) => {
       this.grades = value;
     });

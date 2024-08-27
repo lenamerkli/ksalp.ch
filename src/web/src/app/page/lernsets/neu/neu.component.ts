@@ -13,6 +13,7 @@ import {AccountService} from "../../../service/account.service";
 import {Router, RouterLink} from "@angular/router";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-neu',
@@ -80,7 +81,9 @@ export class NeuComponent {
     private constantService: ConstantService,
     private accountService: AccountService,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Lernset erstellen - [ksalp.ch]');
     this.constantService.getGrades().subscribe((value: string[]) => {
       this.grades = value;
     });

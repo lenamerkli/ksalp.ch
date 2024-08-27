@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-404',
@@ -8,5 +9,11 @@ import { Component } from '@angular/core';
   styleUrl: './404.component.scss'
 })
 export class _404Component {
+
+  constructor(
+    private titleService: Title,
+  ) {
+    this.titleService.setTitle('Seite nicht gefunden - [ksalp.ch]');
+  }
 
 }

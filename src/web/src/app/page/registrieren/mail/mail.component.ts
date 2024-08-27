@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {DefaultResponseDto} from "../../../type/defaulf-response";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-mail',
@@ -17,7 +18,10 @@ export class MailComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private httpClient: HttpClient,
     private router: Router,
-    ) {}
+    private titleService: Title,
+    ) {
+    this.titleService.setTitle('Registrieren - [ksalp.ch]');
+  }
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((value) => {

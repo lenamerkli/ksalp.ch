@@ -6,7 +6,7 @@ import {AccountService} from "../../../service/account.service";
 import {Account} from "../../../type/account";
 import {MatDivider} from "@angular/material/divider";
 import {MatAnchor, MatButton} from "@angular/material/button";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {DomSanitizer, SafeUrl, Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-vorschau',
@@ -53,7 +53,9 @@ export class VorschauComponent{
     private httpClient: HttpClient,
     private accountService: AccountService,
     private domSanitizer: DomSanitizer,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Dokument Vorschau - [ksalp.ch]');
     this.activatedRoute.params.subscribe({
       next: (params) => {
         this.documentId = params['id'];
@@ -66,6 +68,7 @@ export class VorschauComponent{
               this.documentUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(url);
               this.documentUrlFrame = this.domSanitizer.bypassSecurityTrustResourceUrl(url + '#view=FitH');
               this.previewAvailable = this.mimetypePreviews.includes(this.document.getMimetype());
+              this.titleService.setTitle('Dokument `[' + this.document.getSubject().toUpperCase() + '] ' + this.document.getTitle() + '` - [ksalp.ch]');
             } else {
               alert(value.message);
             }

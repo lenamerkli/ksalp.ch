@@ -3,6 +3,7 @@ import {MatButton} from "@angular/material/button";
 import {ConstantService} from "../../../service/constant.service";
 import {RouterLink} from "@angular/router";
 import {MatDivider} from "@angular/material/divider";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-datenschutz',
@@ -31,7 +32,9 @@ export class DatenschutzComponent {
 
   constructor(
     private constantService: ConstantService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Datenschutz - [ksalp.ch]');
     this.constantService.getImprint().subscribe((value: {
       name: string,
       address: string,

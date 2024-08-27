@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-weiter',
@@ -8,5 +9,11 @@ import { Component } from '@angular/core';
   styleUrl: './weiter.component.scss'
 })
 export class WeiterComponent {
+
+  constructor(
+    private titleService: Title,
+  ) {
+    this.titleService.setTitle('Registrieren - [ksalp.ch]');
+  }
 
 }

@@ -9,6 +9,7 @@ import {MatInput} from "@angular/material/input";
 import {MatCard, MatCardContent, MatCardImage, MatCardLgImage, MatCardXlImage} from "@angular/material/card";
 import {ConstantService} from "../../service/constant.service";
 import {MatDivider} from "@angular/material/divider";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-index',
@@ -35,7 +36,9 @@ export class IndexComponent {
   constructor(
     public accountService: AccountService,
     public constantService: ConstantService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Hauptseite - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
       this.account = value;
     })

@@ -11,6 +11,7 @@ import {Account} from "../../type/account";
 import {AccountService} from "../../service/account.service";
 import {MatOption} from "@angular/material/autocomplete";
 import {MatSelect} from "@angular/material/select";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-dokumente',
@@ -51,8 +52,10 @@ export class DokumenteComponent implements OnInit {
 
   constructor(
     private httpClient: HttpClient,
-    private accountService: AccountService
+    private accountService: AccountService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Dokumente - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
       this.account = value;
     })

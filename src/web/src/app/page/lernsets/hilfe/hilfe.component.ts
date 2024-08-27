@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-hilfe',
@@ -8,5 +9,11 @@ import { Component } from '@angular/core';
   styleUrl: './hilfe.component.scss'
 })
 export class HilfeComponent {
+
+  constructor(
+    private titleService: Title,
+  ) {
+    this.titleService.setTitle('Lernset Hilfe - [ksalp.ch]');
+  }
 
 }

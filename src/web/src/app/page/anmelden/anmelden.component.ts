@@ -11,6 +11,7 @@ import {Account, AccountDto} from "../../type/account";
 import {DefaultResponseDto} from "../../type/defaulf-response";
 import {AccountService} from "../../service/account.service";
 import {MatDivider} from "@angular/material/divider";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-anmelden',
@@ -37,7 +38,9 @@ export class AnmeldenComponent {
     private router: Router,
     private httpClient: HttpClient,
     private accountService: AccountService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Anmelden - [ksalp.ch]');
     merge(this.email.statusChanges, this.email.valueChanges)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateErrorMessageEmail());

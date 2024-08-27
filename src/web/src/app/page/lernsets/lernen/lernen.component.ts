@@ -10,6 +10,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {MatButton} from "@angular/material/button";
 import {DefaultResponseDto} from "../../../type/defaulf-response";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-lernen',
@@ -52,7 +53,9 @@ export class LernenComponent implements OnInit {
     private httpClient: HttpClient,
     private accountService: AccountService,
     private activatedRoute: ActivatedRoute,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Lernen - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe({
       next: (value) => {
         this.account = value;

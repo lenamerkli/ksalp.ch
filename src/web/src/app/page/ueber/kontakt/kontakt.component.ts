@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {ConstantService} from "../../../service/constant.service";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-kontakt',
@@ -23,7 +24,9 @@ export class KontaktComponent {
 
   constructor(
     private constantService: ConstantService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Kontakt - [ksalp.ch]');
     this.constantService.getImprint().subscribe((value: {
       name: string,
       address: string,

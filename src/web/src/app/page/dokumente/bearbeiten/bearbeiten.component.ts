@@ -16,6 +16,7 @@ import {ConstantService} from "../../../service/constant.service";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {DefaultResponseDto} from "../../../type/defaulf-response";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-bearbeiten',
@@ -88,7 +89,9 @@ export class BearbeitenComponent {
     private accountService: AccountService,
     private constantService: ConstantService,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Dokument bearbeiten - [ksalp.ch]');
     this.activatedRoute.params.subscribe({
       next: (params) => {
         this.documentId = params['id'];
@@ -102,6 +105,7 @@ export class BearbeitenComponent {
               this.class_.setValue(this.document.getClass());
               this.grade.setValue(this.document.getGrade());
               this.language.setValue(this.document.getLanguage());
+              this.titleService.setTitle('Dokument `[' + this.document.getSubject().toUpperCase() + '] ' + this.document.getTitle() + '` bearbeiten - [ksalp.ch]');
             } else {
               alert(value.message);
             }

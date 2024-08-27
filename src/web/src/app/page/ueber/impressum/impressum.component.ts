@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {ConstantService} from "../../../service/constant.service";
 import {MatDivider} from "@angular/material/divider";
 import {RouterLink} from "@angular/router";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-impressum',
@@ -28,7 +29,9 @@ export class ImpressumComponent {
 
   constructor(
     private constantService: ConstantService,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Impressum - [ksalp.ch]');
     this.constantService.getImprint().subscribe((value: {
       name: string,
       address: string,

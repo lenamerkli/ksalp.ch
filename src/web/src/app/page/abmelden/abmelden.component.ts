@@ -4,6 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {DefaultResponseDto} from "../../type/defaulf-response";
 import {AccountService} from "../../service/account.service";
 import {Account} from "../../type/account";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-abmelden',
@@ -18,7 +19,10 @@ export class AbmeldenComponent implements OnInit {
     private httpClient: HttpClient,
     private router: Router,
     private accountService: AccountService,
-  ) {}
+    private titleService: Title,
+  ) {
+    this.titleService.setTitle('Abmelden - [ksalp.ch]');
+  }
 
   ngOnInit(): void {
 

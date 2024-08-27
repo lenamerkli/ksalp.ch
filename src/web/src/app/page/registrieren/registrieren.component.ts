@@ -20,6 +20,7 @@ import {MatOption, MatSelect} from "@angular/material/select";
 import {MatCheckbox} from "@angular/material/checkbox";
 import {zxcvbn} from "@zxcvbn-ts/core";
 import {MatDivider} from "@angular/material/divider";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-registrieren',
@@ -89,7 +90,9 @@ export class RegistrierenComponent {
   constructor(
     private router: Router,
     private httpClient: HttpClient,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Registrieren - [ksalp.ch]');
     merge(this.name.statusChanges, this.name.valueChanges)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.updateErrorMessageName());

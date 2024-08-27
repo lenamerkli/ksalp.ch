@@ -23,6 +23,7 @@ import {zxcvbn} from "@zxcvbn-ts/core";
 import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {AbmeldenComponent} from "../abmelden/abmelden.component";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-einstellungen',
@@ -108,7 +109,9 @@ export class EinstellungenComponent implements OnInit{
     private constantService: ConstantService,
     private httpClient: HttpClient,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Einstellungen - [ksalp.ch]');
     this.accountService.getAccountInfo().subscribe((value: Account | null) => {
       this.account = value;
       this.setDefaults();
@@ -414,6 +417,7 @@ export class EinstellungenComponent implements OnInit{
               this.httpClient,
               this.router,
               this.accountService,
+              this.titleService,
             ).ngOnInit();
           } else {
             alert(response.message);

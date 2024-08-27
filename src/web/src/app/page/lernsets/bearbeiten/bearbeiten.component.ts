@@ -16,6 +16,7 @@ import {merge} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {DefaultResponseDto} from "../../../type/defaulf-response";
 import {LearnSet, LearnSetDto} from "../../../type/learnset";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-bearbeiten',
@@ -87,7 +88,9 @@ export class BearbeitenComponent {
     private accountService: AccountService,
     private constantService: ConstantService,
     private router: Router,
+    private titleService: Title,
   ) {
+    this.titleService.setTitle('Lernset bearbeiten - [ksalp.ch]');
     this.activatedRoute.params.subscribe({
       next: (params) => {
         this.learnsetId = params['id'];
@@ -101,6 +104,7 @@ export class BearbeitenComponent {
               this.class_.setValue(this.learnset.getClass());
               this.grade.setValue(this.learnset.getGrade());
               this.language.setValue(this.learnset.getLanguage());
+              this.titleService.setTitle('Lernset `[' + this.learnset.getSubject().toUpperCase() + '] ' + this.learnset.getTitle() + '` bearbeiten - [ksalp.ch]');
             } else {
               alert(value.message);
             }

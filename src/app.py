@@ -14,7 +14,7 @@ from flask import Flask, g, session, request, Response, send_from_directory, mak
 from hashlib import pbkdf2_hmac, sha3_512
 from ipaddress import ip_address, IPv4Address, IPv6Address
 from json import loads, dumps
-from logging import FileHandler as LogFileHandler, StreamHandler as LogStreamHandler
+from logging import FileHandler as LogFileHandler
 from logging import INFO as LOG_INFO, exception as log_exception
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
 from os import urandom, environ, listdir
@@ -387,33 +387,33 @@ def scan_request():
     if content_length > pow(2, 10 * 3) * 2:
         raise OverflowError('Content too large')
 
-    if 0 < content_length <= 1024:
-        content = request.get_data()
-        if isinstance(content, bytes):
-            content = content.decode()
-    elif content_length > 1024:
-        hash_obj = sha3_512()
-        while True:
-            chunk = request.stream.read(pow(2, 10 * 2))
-            if not chunk:
-                break
-            hash_obj.update(chunk)
-        content = f"sha3_512:{urlsafe_b64encode(hash_obj.digest()).decode()}"
-    else:
-        content = ''
-
-    passwords = []
-    if request.is_json:
-        data = request.json
-        for key in ['password', 'oldPassword', 'newPassword']:
-            if key in data:
-                if isinstance(data[key], str) and len(data[key]) > 4:
-                    passwords.append(data[key])
-    for password in passwords:
-        content = content.replace(password, '\\PASSWORD\\')
+    # if 0 < content_length <= 1024:
+    #     content = request.get_data()
+    #     if isinstance(content, bytes):
+    #         content = content.decode()
+    # elif content_length > 1024:
+    #     hash_obj = sha3_512()
+    #     while True:
+    #         chunk = request.stream.read(pow(2, 10 * 2))
+    #         if not chunk:
+    #             break
+    #         hash_obj.update(chunk)
+    #     content = f"sha3_512:{urlsafe_b64encode(hash_obj.digest()).decode()}"
+    # else:
+    #     content = ''
+    #
+    # passwords = []
+    # if request.is_json:
+    #     data = request.json
+    #     for key in ['password', 'oldPassword', 'newPassword']:
+    #         if key in data:
+    #             if isinstance(data[key], str) and len(data[key]) > 4:
+    #                 passwords.append(data[key])
+    # for password in passwords:
+    #     content = content.replace(password, '\\PASSWORD\\')
 
     access_log.info(f"{hash_ip(ip)}\t{score}\t{int(is_signed_in())}\t{request.method}\t{path}\t{user_agent}\t"
-                    f"{headers}\t{content_length}\t{content}")
+                    f"{headers}\t{content_length}\t\\UNAVAILABLE")
     return score
 
 

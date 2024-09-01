@@ -272,6 +272,13 @@ export class LernenComponent implements OnInit {
     this.saveAnswer(input, value);
     this.nextExercise();
   }
+
+  keydown(event: any) {
+    if(event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.continue();
+    }
+  }
 }
 
 interface Dto{

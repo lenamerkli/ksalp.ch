@@ -15,7 +15,7 @@
     <br>
     <mat-form-field [style.width.em]="48">
       <mat-label>Ihre Antwort</mat-label>
-      <textarea rows="8" matInput id="answer" #userInput></textarea>
+      <textarea rows="8" matInput id="answer" #userInput (keydown.enter)="keydown($event)"></textarea>
     </mat-form-field>
     <br>
     <button mat-raised-button color="primary" (click)="continue()">Weiter</button>

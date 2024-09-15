@@ -169,7 +169,7 @@ export class LernenComponent implements OnInit {
       let id = this.exercises[i].getId();
       if(this.stats.hasOwnProperty(id)) {
         if(this.stats[id].wrong > this.stats[id].correct) {
-          chances[id] = 10 * this.exercises[i].getFrequency();
+          chances[id] = (this.exercises.length / 2) * this.exercises[i].getFrequency();
         } else {
           chances[id] = Math.max(0.05, 3 * this.stats[id].wrong - 2 * this.stats[id].correct) * this.exercises[i].getFrequency();
         }

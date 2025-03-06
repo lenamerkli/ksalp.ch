@@ -6,4 +6,7 @@
 <a href="https://github.com/LenaMerkli/ksalp.ch/commits/main"><img alt="Commit Activity" src="https://img.shields.io/github/commit-activity/m/lenamerkli/ksalp.ch?color=green&style=for-the-badge"></a>
 </p>
 
-This repository contains the source code of the website "ksalp.ch" which is not online yet. 
+ksalp.ch ist eine Lernplattform für Lernende von Lernenden der Kantonsschule Alpenquai Luzern. Lernende
+von anderen Gymnasien sind hier auch herzlich willkommen. Diese Plattform lebt von den Beiträgen der
+Nutzenden. Diese Dienstleistung ist kostenlos und werbefrei. Damit das auch weiter so bleibt, sind wir
+auf Spenden und Einnahmen durch das Premium-Abo angewiesen.

@@ -1135,6 +1135,7 @@ class Document:
                     return f"{x} Bytes"
                 else:
                     return f"{x:3.1f} {v}{'i' if use_1024 else ''}B"
+        return f"{self.size} Bytes"
 
     def get_owner(self) -> User:
         """

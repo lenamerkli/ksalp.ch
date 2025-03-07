@@ -33,3 +33,5 @@ logs/
 build/
 tmp/
 temp/
+dist/
+.angular/

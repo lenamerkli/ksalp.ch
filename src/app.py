@@ -36,10 +36,9 @@ from resources import *
 # GENERAL SETUP
 ########################################################################################################################
 
+load_dotenv()
 
 DEVELOPMENT = environ.get('ENVIRONMENT', '') == 'dev'
-
-load_dotenv()
 app = Flask(__name__)
 
 if not exists(join(app.root_path, 'resources', 'key.bin')):
@@ -3213,6 +3212,45 @@ def r_api_v1_calendars_selection_update():
     return {
         'status': 'success',
         'message': 'Calendar selections have been updated.',
+    }
+
+@app.route('/api/v1/authorize', methods=['POST'])
+@login_required
+def r_api_v1_authorize():
+    data = request.get_json(force=True, silent=True)
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'url',
+        'token',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `url`, `token`',
+        }, 415
+    account = Login.load(session['account']).get_account()
+    req = requests_send(
+        method='POST',
+        url=data['url'],
+        headers={
+            'Content-Type': 'application/json',
+        },
+        data=dumps({
+            'mail': account.mail,
+            'token': data['token'],
+        }),
+    )
+    if req.status_code != 200:
+        return {
+            'error': 'request error',
+            'message': 'Request failed.',
+        }, 500
+    return {
+        'status': 'success',
+        'message': 'Successfully authorized.',
     }
 
 

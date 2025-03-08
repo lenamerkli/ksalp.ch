@@ -1,0 +1,29 @@
+<div id="container">
+  <h2>Applikation autorisieren</h2>
+  @if (invalid) {
+    <p>Es ist ein Fehler aufgetreten. Bitte versuchen Sie es mit einem anderen Link erneut oder kontaktieren Sie den Administrator der Webseite, die Sie autorisieren wollen.</p>
+  }
+  @else if (token === null) {
+    <p>Bitte warten Sie einen Moment, während ksalp.ch lädt.</p>
+  }
+  @else if (account !== null && account.isValid()) {
+    <p>Möchten Sie die Applikation <i><b>{{token.getPreviewUrl()}}</b></i> wirklich autorisieren und mit Ihrem Konto verbinden? Ihre E-Mail Adresse wird weitergegeben.</p>
+    @if (!['ksalp.ch'].includes(token.getPreviewUrl())) {
+      <p>ksalp.ch hat keinen Einfluss auf die Inhalte und Prozesse von <i>{{token.getPreviewUrl()}}</i></p>
+    }
+    <p>Überprüfen Sie unbedingt, dass Sie diesen Link von der betreffenden Webseite erhalten haben.</p>
+    <button mat-raised-button color="warn" (click)="authorize()"><i>{{token.getPreviewUrl()}}</i> autorisieren</button>
+    <span style="margin-left: 1em;"></span>
+    <button mat-raised-button color="primary" (click)="cancel()">Abbrechen</button>
+  } @else {
+    <p>Sie müssen angemeldet sein, um Applikationen wie <i>{{token.getPreviewUrl()}}</i> zu autorisieren.</p>
+    <button mat-raised-button color="primary" routerLink="/anmelden">Anmelden</button>
+    <br>
+    <br>
+    <p>Falls Sie noch kein Konto haben, registrieren Sie sich bitte.</p>
+    <button mat-raised-button color="primary" routerLink="/registrieren">Registrieren</button>
+    <br>
+    <br>
+    <p>Nach dem Anmelden öffnen Sie bitte den Link erneut.</p>
+  }
+</div>

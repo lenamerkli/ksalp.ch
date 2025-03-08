@@ -27,6 +27,7 @@ import {KaufenComponent as PremiumLiteKaufenComponent} from "./page/premium/lite
 import {KontaktComponent} from "./page/ueber/kontakt/kontakt.component";
 import {TeamComponent} from "./page/ueber/team/team.component";
 import {HilfeComponent} from "./page/lernsets/hilfe/hilfe.component";
+import {AutorisierenComponent} from "./page/autorisieren/autorisieren.component";
 
 export const routes: Routes = [
   {path: '', component: IndexComponent},
@@ -56,5 +57,6 @@ export const routes: Routes = [
   {path: 'über/impressum', component: ImpressumComponent},
   {path: 'über/datenschutz', component: DatenschutzComponent},
   {path: 'über/agb', component: AgbComponent},
+  {path: 'autorisieren/:token', component: AutorisierenComponent},
   {path: '**', component: _404Component},
 ];

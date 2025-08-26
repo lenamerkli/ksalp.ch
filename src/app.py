@@ -19,6 +19,7 @@ from logging import INFO as LOG_INFO, exception as log_exception
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
 from os import urandom, environ, listdir
 from os.path import join, exists, dirname, getsize
+from pathlib import Path
 from random import uniform as rand_uniform
 from requests import request as requests_send
 from smtplib import SMTP
@@ -3251,6 +3252,34 @@ def r_api_v1_authorize():
     return {
         'status': 'success',
         'message': 'Successfully authorized.',
+    }
+
+
+@app.route('/api/v1/news/<file_name>', methods=['GET'])
+def r_api_v1_news_list(file_name):
+    if DEVELOPMENT:
+        return {
+            'content': '<p>Entwicklermodus ist aktiv</p>',
+            'status': 'success',
+            'message': 'news article found',
+        }
+    not_found = {
+        'content': '<p>Artikel wurde nicht gefunden</p>',
+        'error': 'not found',
+        'message': 'news article not found',
+    }, 400
+    for i in "\n\\./":
+        if i in file_name:
+            return not_found
+    full_path = join('/var/www/ksalp-ch-news/', file_name + '.html')
+    if not exists(full_path):
+        return not_found
+    with open(full_path, 'r') as file:
+        content = file.read()
+    return {
+        'content': content,
+        'status': 'success',
+        'message': 'news article found',
     }
 
 

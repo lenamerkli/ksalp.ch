@@ -5,8 +5,10 @@
     <mat-divider></mat-divider>
     <h3>Inhaltsverzeichnis</h3>
     <ul class="contents-list">
+      <!--
       <li><button mat-button (click)="scrollToElement(premium)">Premium</button></li>
       <li><button mat-button (click)="scrollToElement(farbschema)">Farbschema</button></li>
+      -->
       <li><button mat-button (click)="scrollToElement(klassen)">Klassen</button></li>
       <li><button mat-button (click)="scrollToElement(klassenstufe)">Klassenstufe</button></li>
       <li><button mat-button (click)="scrollToElement(suchmaschine)">Suchmaschine</button></li>
@@ -15,6 +17,7 @@
       <li><button mat-button (click)="scrollToElement(passwort)">Passwort</button></li>
       <li><button mat-button (click)="scrollToElement(benachrichtigungen)">Benachrichtigungen</button></li>
     </ul>
+    <!--
     <mat-divider></mat-divider>
     <h3 #premium>Premium</h3>
     @if (account.isPaid()){
@@ -47,6 +50,7 @@
     } @else {
       <p>Da Sie kein Premium-Abonnement besitzen, können Sie Ihr Farbschema nicht ändern.</p>
     }
+    -->
     <mat-divider></mat-divider>
     <h3 #klassen>Klassen</h3>
     <p>Sie sind in der Klasse <i>{{account.getClasses()}}</i>.</p>

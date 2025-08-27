@@ -9,4 +9,4 @@
 ksalp.ch ist eine Lernplattform für Lernende von Lernenden der Kantonsschule Alpenquai Luzern. Lernende
 von anderen Gymnasien sind hier auch herzlich willkommen. Diese Plattform lebt von den Beiträgen der
 Nutzenden. Diese Dienstleistung ist kostenlos und werbefrei. Damit das auch weiter so bleibt, sind wir
-auf Spenden und Einnahmen durch das Premium-Abo angewiesen.
+auf Spenden angewiesen.

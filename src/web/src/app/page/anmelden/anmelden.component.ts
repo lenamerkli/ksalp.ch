@@ -91,4 +91,21 @@ export class AnmeldenComponent {
         });
     }
   }
+
+  signInWithFidesVault(){
+    this.httpClient.post<{status?: string, url?: string}>('/api/v1/account/fidesvault/start', JSON.stringify({}), {headers: {'Content-Type': 'application/json'}})
+      .subscribe({
+        next: response => {
+          if (response && response.url) {
+            window.location.href = response.url;
+          } else {
+            alert('FidesVault konnte nicht gestartet werden.');
+          }
+        },
+        error: error => {
+          console.log(error);
+          alert('FidesVault konnte nicht gestartet werden.');
+        }
+      });
+  }
 }

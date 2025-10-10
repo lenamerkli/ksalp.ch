@@ -109,3 +109,8 @@ CREATE TABLE IF NOT EXISTS ips (
     score INTEGER NOT NULL,
     description TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS fidesvault_temp (
+    id TEXT PRIMARY KEY,
+    valid TEXT NOT NULL,
+    browser TEXT NOT NULL
+);

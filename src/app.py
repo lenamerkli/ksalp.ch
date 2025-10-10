@@ -19,7 +19,6 @@ from logging import INFO as LOG_INFO, exception as log_exception
 from logging import basicConfig as log_basicConfig, getLogger as GetLogger, Formatter as LogFormatter
 from os import urandom, environ, listdir
 from os.path import join, exists, dirname, getsize
-from pathlib import Path
 from random import uniform as rand_uniform
 from requests import request as requests_send
 from smtplib import SMTP
@@ -28,6 +27,7 @@ from ssl import create_default_context
 from time import sleep
 from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
+import re
 import typing as t
 import qrbill
 
@@ -243,6 +243,27 @@ def send_mail(address: str, subject: str, message_plain: str, message: str) -> t
     finally:
         server.quit()
     return None
+
+
+def guess_name_from_email(email):
+    username = email.split('@')[0]
+    username = re.sub(r'\d+$', '', username)
+    for sep in ['.', '_', '-']:
+        if sep in username:
+            parts = username.split(sep)
+            if len(parts) >= 2:
+                first = re.sub(r'\d+', '', parts[0]).capitalize()
+                last = re.sub(r'\d+', '', parts[1]).capitalize()
+                if first and last:
+                    return f"{first} {last}"
+    camel_case = re.findall(r'[A-Z][a-z]*', username)
+    if len(camel_case) >= 2:
+        return f"{camel_case[0]} {camel_case[1]}"
+    parts = re.split(r'\d+', username)
+    if len(parts) >= 2:
+        first, last = parts[0], parts[1]
+        return f"{first.capitalize()} {last.capitalize()}"
+    return username.lower().capitalize()
 
 
 ########################################################################################################################
@@ -2200,6 +2221,8 @@ def before_request():
     score = scan_request()
     if score == 0:
         return render_template('_banned.html', ip=request.access_route[-1]), 403
+    else:
+        pass  # noqa
 
 
 @app.route('/static/<path:file>', methods=['GET'])
@@ -2351,6 +2374,82 @@ def r_api_v1_account_signin():
         'status': 'success',
         'message': 'You are now signed-in with cookies.'
     }, 200
+
+
+@app.route('/api/v1/account/fidesvault/start', methods=['POST'])
+def r_api_v1_account_fidesvault_start():
+    try:
+        secret = rand_base64(64)
+        valid_until = (datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d_%H-%M-%S')
+        query_db('INSERT INTO fidesvault_temp VALUES (?, ?, ?)', (secret, valid_until, extract_browser(request.user_agent)))
+        callback_url = f"{request.scheme}://{request.host}/api/v1/account/fidesvault/callback"
+        redirect_url = f"{request.scheme}://{request.host}/"
+        token = f"{urlsafe_b64encode(callback_url.encode()).decode()}.{secret}.{urlsafe_b64encode(redirect_url.encode()).decode()}"
+        url = f"https://fidesvault.merkli.me/email/authorize/{token}"
+        session['account'] = secret
+        return {
+            'status': 'success',
+            'url': url,
+        }, 200
+    except Exception as error:
+        log_exception('Exception during FidesVault start' + 0 * str(error))
+        return {
+            'error': 'internal error',
+            'message': 'Could not initiate FidesVault flow.',
+        }, 500
+
+
+@app.route('/api/v1/account/fidesvault/callback', methods=['POST'])
+def r_api_v1_account_fidesvault_callback():
+    data = request.get_json(force=True, silent=True)
+    sleep(rand_uniform(0.05, 0.15))
+    if (data is None) or (not isinstance(data, dict)):
+        return {
+            'error': 'json parse error',
+            'message': 'JSON object could not be parsed.',
+        }, 415
+    if not all(data.get(i, '') for i in [
+        'mail',
+        'token',
+    ]):
+        return {
+            'error': 'missing fields',
+            'message': 'At least one of the following required fields is missing: `mail`, `token`',
+        }, 415
+    try:
+        db_row = query_db('SELECT valid, browser FROM fidesvault_temp WHERE id=?', (data['token'],), True)
+        if not db_row:
+            return {
+                'error': 'invalid token',
+                'message': 'The token could not be found.',
+            }, 400
+        valid_until = datetime.strptime(db_row[0], '%Y-%m-%d_%H-%M-%S')
+        if valid_until < datetime.now():
+            query_db('DELETE FROM fidesvault_temp WHERE id=?', (data['token'],))
+            return {
+                'error': 'expired token',
+                'message': 'The token has expired.',
+            }, 400
+        # Token is valid: mark as used (single-use) and accept the authorization
+        query_db('DELETE FROM fidesvault_temp WHERE id=?', (data['token'],))
+        email = data['mail']
+        user_id = query_db('SELECT id FROM users WHERE mail=?', (email,), True)[0]
+        if not user_id:
+            user = User(name=guess_name_from_email(email), mail=email, salt=b'FidesVault', hash_=b'FidesVault')
+            user.save()
+            user_id = user.id_
+        login = Login(id_=data['token'], account=user_id, browser=db_row[1])
+        login.save()
+        return {
+            'status': 'success',
+            'message': 'Authorization confirmed.',
+        }, 200
+    except Exception as error:
+        log_exception('Exception during FidesVault callback' + 0 * str(error))
+        return {
+            'error': 'internal error',
+            'message': 'Could not process FidesVault callback.',
+        }, 500
 
 
 @app.route('/api/v1/account/register', methods=['POST'])
@@ -3294,8 +3393,7 @@ def error_handler_404(*_, **__):
             cookies=request.cookies,
             allow_redirects=True,
         )
-        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding',
-                            'connection']
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
         headers = [
             (k, v) for k, v in res.raw.headers.items()
             if k.lower() not in excluded_headers

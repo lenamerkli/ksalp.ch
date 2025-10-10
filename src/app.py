@@ -22,6 +22,7 @@ from os.path import join, exists, dirname, getsize
 from random import uniform as rand_uniform
 from requests import request as requests_send
 from smtplib import SMTP
+from socket import gethostbyname
 from sqlite3 import connect as sqlite_connect, Connection as SQLite_Connection
 from ssl import create_default_context
 from time import sleep
@@ -2403,6 +2404,13 @@ def r_api_v1_account_fidesvault_start():
 def r_api_v1_account_fidesvault_callback():
     data = request.get_json(force=True, silent=True)
     sleep(rand_uniform(0.05, 0.15))
+    ip1 = request.access_route[-1]
+    ip2 = gethostbyname('fidesvault.merkli.me')
+    if ip1 != ip2:
+        return {
+            'error': 'ip mismatch',
+            'message': 'The IP address of the request does not match the IP address of the FidesVault server.',
+        }, 401
     if (data is None) or (not isinstance(data, dict)):
         return {
             'error': 'json parse error',
